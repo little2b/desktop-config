@@ -106,10 +106,10 @@ Item {
         onClicked: mouse => {
             if (moved || !pressedEntry) return;
             if (pressedEntry.kind === "folder") pad.openFolder(pressedEntry.id);
-            else {
+            else if (mouse.button === Qt.RightButton) {
                 const p = mapToItem(pad.stageItem, mouse.x, mouse.y);
                 pad.showMenu(pressedEntry.app, p.x + 8, p.y + 8);
-            }
+            } else pad.launch(pressedEntry.app);
         }
     }
 }

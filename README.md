@@ -39,7 +39,7 @@ python3 scripts/restore.py --apply --same-hardware
 ```
 
 恢复前若目标桌面已经在运行，先停止 `clavis-shell.service`、`nyx-dock.service`、
-`fcitx5-niri.service`。恢复程序会检查这一点并保留现有文件到
+`fcitx5-niri.service`、`nyx-theme-sync.path` 和 `nyx-theme-sync.service`。恢复程序会检查这一点并保留现有文件到
 `~/.local/state/desktop-config-backups/`，不会清空整个配置目录。
 可用 `--target-home /tmp/desktop-preview` 试装到临时目录。
 
@@ -51,7 +51,9 @@ python3 scripts/restore.py --apply --same-hardware
 
 | 部分 | 内容 |
 |---|---|
-| 独立 Dock | 全部 QML/JS 源码、启动台分组、固定应用顺序、图标回退及外观设置 |
+| 独立 Dock | 悬停保持显示、右键操作菜单、应用页面左键启动/右键菜单、拖拽分组、固定顺序及外观设置 |
+| 应用卸载 | Arch 的 pacman/AUR、Fedora 的 RPM 和 Flatpak 卸载确认；手动安装程序和网页应用显示处理提示 |
+| 文件管理器/终端 | Dolphin 中文入口、Alacritty/Konsole 配色、字体与留白，跟随 Clavis 主题 |
 | Niri | 快捷键、窗口规则、缩放与显示器布局、鼠标和光标配置 |
 | Clavis | 主题、侧栏、桌面卡片、时间卡片位置、输入偏好、电源设置、沙坪坝天气及网盘功能开关 |
 | 输入法 | Fcitx5 配置、雾凇拼音源码词库、自定义配置及一致性快照的用户词库 |
@@ -81,11 +83,11 @@ Microsoft Office/WPS 字体及其他软件的账号、数据和授权需要单�
 ## 后续修改和更新
 
 这是 2026-09-14 的快照，包含此前修复的侧栏残留、抽屉保留桌面卡片、滚动、通知布局
-以及天气测试隔离。后续修改 Clavis 源码推送到 `quickshell` 的定制分支；修改本仓库的
-Dock 或配置后，更新清单再提交：
+以及天气测试隔离。后续修改 Clavis 源码推送到 `quickshell` 的定制分支；修改本机 Dock 或桌面偏好后，在本仓库收集当前设置并提交：
 
 ```bash
-python3 scripts/update-manifest.py
+python3 scripts/capture-current.py --apply
+python3 -m unittest discover -s tests -v
 python3 scripts/restore.py --same-hardware
 git add .
 git commit -m '更新个人桌面配置'
@@ -94,6 +96,16 @@ git push
 
 更新 Clavis 固定版本前，在独立源码目录验证新提交，再更新 `sources.lock.json`。
 不要将包含真实凭据的目录添加到本仓库。迁移前若当前桌面又有调整，需先刷新快照。
+
+`capture-current.py` 只收集明确的桌面设置、Dock 源码和卸载辅助程序；替换本机 Home 路径、
+移除 API 密钥/令牌字段，并清空网盘账号绑定。它不会停止输入法，也不会复制正在写入的
+Rime 用户数据库；仓库保留上次一致性快照的用户词库。Clavis 源码必须先提交，快照才会
+记录对应提交，避免新系统构建出不同的桌面。现有 Arch 专用服务和主题同步适配会保留。
+
+应用卸载在 Arch 上使用 `pacman -R` 并保留确认步骤，AUR 安装的包也由 pacman 管理。
+它不会绕过软件包依赖保护或删除 Flatpak 个人数据。应用并非由软件包管理器安装时，
+菜单会给出安装位置和处理提示；不会猜测目录并递归删除。主题同步不依赖完整 Plasma
+桌面，缺少 `plasma-apply-colorscheme` 时使用 KDE 标准颜色配置与刷新信号。
 
 ## 验证范围
 

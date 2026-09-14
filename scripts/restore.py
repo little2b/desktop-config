@@ -95,7 +95,7 @@ def restore(target_home, same_hardware=False, apply=False, root=ROOT):
         return None
     active_units = []
     if target_home.resolve() == Path.home().resolve():
-        for unit in ['clavis-shell.service', 'nyx-dock.service', 'fcitx5-niri.service']:
+        for unit in ['clavis-shell.service', 'nyx-dock.service', 'fcitx5-niri.service', 'nyx-theme-sync.path', 'nyx-theme-sync.service']:
             if subprocess.run(['systemctl', '--user', 'is-active', '--quiet', unit], check=False).returncode == 0:
                 active_units.append(unit)
         # Fcitx may have been started by desktop autostart rather than this unit.

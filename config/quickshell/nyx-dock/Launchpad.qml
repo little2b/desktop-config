@@ -189,6 +189,15 @@ PanelWindow {
         dismiss();
         controller.activate(controller.canonical(app.id), false);
     }
+    function uninstall(app) {
+        if (!app) return;
+        const id = app.id;
+        const title = "卸载应用 — " + app.name;
+        dismiss();
+        Quickshell.execDetached(["/usr/bin/alacritty", "--title", title, "-e", "/usr/bin/python3",
+            Quickshell.env("HOME") + "/.local/lib/nyx-dock/uninstall-app.py", "--", id]);
+    }
+    function forgetApplication(id) { saveFolders(Grouping.remove(folders, id)); }
 
     visible: opened || revealAnimation.running
     anchors { top: true; bottom: true; left: true; right: true }
@@ -471,7 +480,7 @@ PanelWindow {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom; anchors.bottomMargin: 30
-            text: "拖到另一个应用上创建分组  ·  拖到屏幕边缘翻页  ·  左键选择操作  ·  Esc 返回"
+            text: "左键打开应用  ·  右键更多操作  ·  拖动应用可分组  ·  Esc 返回"
             color: "#9cddd0e4"; font.pixelSize: 12
         }
         Rectangle {
@@ -480,7 +489,9 @@ PanelWindow {
             objectName: "launchpadAppMenu"
             x: pad.menuX; y: pad.menuY
             visible: pad.selectedApp !== null
-            width: 246; height: pad.selectedApp && Grouping.containing(pad.folders, pad.selectedApp.id) ? 193 : 147; radius: 17
+            readonly property var actions: pad.selectedApp && Grouping.containing(pad.folders, pad.selectedApp.id)
+                ? ["打开应用", "pin", "remove", "uninstall"] : ["打开应用", "pin", "uninstall"]
+            width: 246; height: 55 + actions.length * 46; radius: 17
             color: "#fa35303e"
             border.width: 1; border.color: "#706e607c"
             MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
@@ -493,7 +504,7 @@ PanelWindow {
             Column {
                 x: 7; y: 42; width: parent.width - 14; spacing: 3
                 Repeater {
-                    model: pad.selectedApp && Grouping.containing(pad.folders, pad.selectedApp.id) ? ["打开应用", "pin", "remove"] : ["打开应用", "pin"]
+                    model: appMenu.actions
                     Rectangle {
                         required property string modelData
                         width: parent.width; height: 43; radius: 10
@@ -501,8 +512,8 @@ PanelWindow {
                         readonly property bool pinned: pad.selectedApp !== null && pad.controller.isPinned(pad.selectedApp.id)
                         Text {
                             x: 12; anchors.verticalCenter: parent.verticalCenter
-                            text: parent.modelData === "remove" ? "移出分组" : parent.modelData === "pin" ? (parent.pinned ? "从 Dock 取消固定" : "将此应用固定到 Dock") : "打开应用"
-                            font.pixelSize: 14; color: "#fff4ff"
+                            text: parent.modelData === "uninstall" ? "卸载应用…" : parent.modelData === "remove" ? "移出分组" : parent.modelData === "pin" ? (parent.pinned ? "从 Dock 取消固定" : "将此应用固定到 Dock") : "打开应用"
+                            font.pixelSize: 14; color: parent.modelData === "uninstall" ? "#ffb4ab" : "#fff4ff"
                         }
                         MouseArea {
                             id: actionMouse
@@ -512,7 +523,8 @@ PanelWindow {
                                 if (parent.modelData === "pin") {
                                     pad.controller.togglePin(pad.controller.canonical(pad.selectedApp.id));
                                     pad.selectedApp = null;
-                                } else if (parent.modelData === "remove") pad.removeFromFolder(pad.selectedApp.id);
+                                } else if (parent.modelData === "uninstall") pad.uninstall(pad.selectedApp);
+                                else if (parent.modelData === "remove") pad.removeFromFolder(pad.selectedApp.id);
                                 else pad.launch(pad.selectedApp);
                             }
                         }

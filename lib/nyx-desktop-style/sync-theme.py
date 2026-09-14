@@ -54,6 +54,23 @@ def ini(data):
     c.write(out, space_around_delimiters=False)
     return out.getvalue()
 
+def apply_kde_palette(scheme, target):
+    """Apply KDE colors without requiring the Plasma desktop package."""
+    existing = configparser.ConfigParser(interpolation=None, strict=False)
+    existing.optionxform = str
+    existing.read(target)
+    source = configparser.ConfigParser(interpolation=None)
+    source.optionxform = str
+    source.read(scheme)
+    for section in source.sections():
+        if section.startswith(('Colors:', 'ColorEffects:')):
+            existing[section] = dict(source[section])
+    if not existing.has_section('General'):
+        existing.add_section('General')
+    existing['General']['ColorScheme'] = source['General']['ColorScheme']
+    atomic(target, ini({section: dict(existing[section]) for section in existing.sections()}))
+
+
 def render(palette, base):
     required = ['surface', 'surface_container', 'surface_container_high', 'surface_container_low',
                 'on_surface', 'on_surface_variant', 'primary', 'primary_container', 'on_primary_container',
@@ -187,7 +204,12 @@ def main():
             if shutil.which('plasma-apply-colorscheme'):
                 subprocess.run(['plasma-apply-colorscheme', profile], env=env, check=True, capture_output=True, text=True)
             else:
-                subprocess.run(['kwriteconfig6', '--file', str(BASE / '.config/kdeglobals'), '--group', 'General', '--key', 'ColorScheme', profile], check=True)
+                apply_kde_palette(BASE / f'.local/share/color-schemes/{profile}.colors', BASE / '.config/kdeglobals')
+                if not args.no_live:
+                    from gi.repository import Gio, GLib
+                    bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+                    bus.emit_signal(None, '/KGlobalSettings', 'org.kde.KGlobalSettings', 'notifyChange', GLib.Variant('(ii)', (0, 0)))
+                    bus.flush_sync(None)
         if not args.no_live:
             refresh_live(profile, qss)
         # Keep bounded history while leaving other user profiles alone.

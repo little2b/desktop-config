@@ -1,0 +1,25 @@
+[DetailsMode]
+IconSize=24
+
+[General]
+ShowFullPathInTitlebar=false
+ShowToolTips=true
+ShowZoomSlider=true
+Version=202
+ViewPropsTimestamp=2026,9,11,13,22,4.435
+
+[IconsMode]
+IconSize=64
+MaximumTextLines=2
+PreviewSize=96
+TextWidthIndex=1
+
+[KFileDialog Settings]
+Places Icons Auto-resize=false
+Places Icons Static Size=22
+
+[MainWindow]
+MenuBar=Disabled
+
+[UiSettings]
+ColorScheme=

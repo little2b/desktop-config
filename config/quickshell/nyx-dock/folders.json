@@ -2,6 +2,28 @@
   "version": 1,
   "folders": [
     {
+      "id": "folder-mu1cus84-kriq6",
+      "name": "libre",
+      "apps": [
+        "libreoffice-math",
+        "libreoffice-impress",
+        "libreoffice-calc",
+        "libreoffice-writer",
+        "libreoffice-draw"
+      ]
+    },
+    {
+      "id": "folder-mu1cugwl-xronb",
+      "name": "WPS",
+      "apps": [
+        "wps-office-et",
+        "wps-office-wpp",
+        "wps-office-wps",
+        "wps-office-prometheus",
+        "wps-office-pdf"
+      ]
+    },
+    {
       "id": "folder-mtx48s44-eayu4",
       "name": "不会打开",
       "apps": [
@@ -24,7 +46,6 @@
         "Alacritty",
         "org.kde.ark",
         "org.kde.discover",
-        "org.kde.dolphin",
         "org.kde.dragonplayer",
         "foot",
         "footclient",

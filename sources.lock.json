@@ -17,5 +17,8 @@
     "distribution": "Fedora 44",
     "niri": "26.04",
     "qt": "6.11.2"
+  },
+  "desktop_snapshot": {
+    "captured_at": "2026-09-14T23:53:32+08:00"
   }
 }

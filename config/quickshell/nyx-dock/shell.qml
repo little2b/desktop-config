@@ -13,6 +13,7 @@ ShellRoot {
     property bool preview: false
     property var iconFallbacks: ({})
     DockTheme { id: theme }
+    readonly property var menuTheme: theme
     FileView {
         path: Qt.resolvedUrl("icon-fallbacks.json")
         preload: true
@@ -22,6 +23,20 @@ ShellRoot {
         }
     }
     Launchpad { id: launchpad; controller: root }
+    DockMenu { id: contextMenu; controller: root; theme: root.menuTheme }
+
+    function openLauncher(output) {
+        contextMenu.dismiss();
+        launchpad.screen = output;
+        launchpad.opened = true;
+    }
+    function movePinned(id, direction) {
+        const ids = settings.pinned.map(root.canonical);
+        const index = ids.indexOf(id), target = index + direction;
+        if (index < 0 || target < 0 || target >= ids.length) return;
+        const other = ids[target]; ids[target] = ids[index]; ids[index] = other;
+        root.configure(JSON.stringify({pinned: ids}));
+    }
 
     FileView {
         id: configFile
@@ -208,10 +223,16 @@ ShellRoot {
                 tooltipBackground: String(theme.tooltipBackground), tooltipForeground: String(theme.tooltipForeground)});
         }
         function getSettings(): string { return JSON.stringify(root.settingsSnapshot()); }
+        function contextMenuStatus(): string { return JSON.stringify(contextMenu.snapshot()); }
         function configure(json: string): string { return root.configure(json); }
         function reveal() { root.preview = true; previewTimeout.restart(); }
         function activate(appId: string) { root.activate(root.canonical(appId), false); }
         function togglePin(appId: string) { root.togglePin(root.canonical(appId)); }
+        function forgetApplication(appId: string) {
+            const pins = settings.pinned.filter(id => root.canonical(id) !== appId);
+            if (pins.length !== settings.pinned.length) root.configure(JSON.stringify({pinned: pins}));
+            launchpad.forgetApplication(appId);
+        }
         function launcher() {
             launchpad.screen = Quickshell.screens[0];
             launchpad.opened = !launchpad.opened;
@@ -263,13 +284,41 @@ ShellRoot {
                     && !root.isIgnored(w.app_id));
             }
             property bool held: false
-            readonly property bool expanded: root.preview || held || !(settings.autoHide || (settings.smartAutoHide && occupied))
+            readonly property bool applicationHovered: {
+                for (let i = 0; i < appRepeater.count; i++) {
+                    const tile = appRepeater.itemAt(i);
+                    if (tile && tile.pointerHovered) return true;
+                }
+                return false;
+            }
+            readonly property bool pointerInside: dockHover.hovered || launcherMouse.containsMouse || applicationHovered
+            readonly property bool menuActive: contextMenu.opened && contextMenu.screen === dock.screen
+            onMenuActiveChanged: {
+                if (menuActive) { hideDelay.stop(); dock.held = true; }
+                else if (!pointerInside) hideDelay.restart();
+            }
+            onVisibleChanged: if (!visible && menuActive) contextMenu.dismiss()
+            onPointerInsideChanged: {
+                if (pointerInside) { hideDelay.stop(); dock.held = true; }
+                else hideDelay.restart();
+            }
+            readonly property bool expanded: root.preview || menuActive || pointerInside || held || !(settings.autoHide || (settings.smartAutoHide && occupied))
+            function openMenu(id, item, x) {
+                const point = item.mapToItem(dock.contentItem, x, 0);
+                dock.tooltip = "";
+                contextMenu.present(id, dock.screen, (dock.screen.width - dock.width) / 2 + point.x,
+                    dock.size + 24 + settings.bottomMargin);
+            }
             property string tooltip: ""
             mask: Region { item: hitArea }
             IpcHandler {
                 target: "dock-" + dock.screen.name
                 function status(): string {
                     return JSON.stringify({expanded: dock.expanded, occupied: dock.occupied,
+                        pointerInside: dock.pointerInside, hidePending: hideDelay.running,
+                        menuActive: dock.menuActive,
+                        windowHovered: dockHover.hovered, launcherHovered: launcherMouse.containsMouse,
+                        applicationHovered: dock.applicationHovered,
                         inputHeight: hitArea.height, width: dock.width, surfaceY: surface.y,
                         visible: dock.visible, iconSize: dock.size, spacing: row.spacing,
                         bottomMargin: settings.bottomMargin, backgroundOpacity: surface.color.a, backgroundColor: String(surface.color),
@@ -291,14 +340,23 @@ ShellRoot {
                 anchors.bottom: parent.bottom
                 width: parent.width
                 height: dock.expanded ? dock.size + 32 + settings.bottomMargin : 3
-                HoverHandler {
-                    onHoveredChanged: {
-                        if (hovered) { hideDelay.stop(); dock.held = true; }
-                        else hideDelay.restart();
-                    }
+            }
+            // Observe the common ancestor of icons and gaps. A handler on the
+            // separate input-mask item loses hover when an icon takes the pointer.
+            HoverHandler {
+                id: dockHover
+                parent: dock.contentItem
+                blocking: false
+            }
+            Timer {
+                id: hideDelay
+                interval: settings.hideDelay
+                onTriggered: {
+                    if (dock.pointerInside || dock.menuActive) return;
+                    dock.held = false;
+                    dock.tooltip = "";
                 }
             }
-            Timer { id: hideDelay; interval: settings.hideDelay; onTriggered: { dock.held = false; dock.tooltip = ""; } }
 
             Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -318,6 +376,12 @@ ShellRoot {
                 border.width: 1
                 border.color: theme.outline
                 Behavior on y { NumberAnimation { duration: 190; easing.type: Easing.OutCubic } }
+                MouseArea {
+                    id: backgroundMouse
+                    anchors.fill: parent
+                    acceptedButtons: Qt.RightButton
+                    onClicked: event => dock.openMenu("", backgroundMouse, event.x)
+                }
 
                 Flickable {
                     anchors.fill: parent
@@ -340,13 +404,13 @@ ShellRoot {
                                 id: launcherMouse
                                 anchors.fill: parent
                                 hoverEnabled: true
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
                                 cursorShape: Qt.PointingHandCursor
                                 onEntered: dock.tooltip = "应用菜单"
                                 onExited: dock.tooltip = ""
-                                onClicked: {
-                                    launchpad.screen = dock.screen;
-                                    launchpad.opened = !launchpad.opened;
-                                    dock.tooltip = "";
+                                onClicked: event => {
+                                    if (event.button === Qt.RightButton) dock.openMenu("", launcherMouse, event.x);
+                                    else root.openLauncher(dock.screen);
                                 }
                             }
                         }
@@ -357,6 +421,7 @@ ShellRoot {
                             Rectangle {
                                 id: tile
                                 required property string modelData
+                                readonly property bool pointerHovered: mouse.containsMouse
                                 readonly property var app: root.entry(modelData)
                                 readonly property url iconSourceUrl: appIcon.source
                                 readonly property int iconStatus: appIcon.status
@@ -398,13 +463,11 @@ ShellRoot {
                                     hoverEnabled: true
                                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
                                     cursorShape: Qt.PointingHandCursor
-                                    onEntered: dock.tooltip = (tile.app ? tile.app.name : tile.modelData)
-                                        + (tile.pinned ? " · 右键取消固定" : " · 右键固定")
+                                    onEntered: dock.tooltip = (tile.app ? tile.app.name : tile.modelData) + " · 右键查看更多操作"
                                     onExited: dock.tooltip = ""
                                     onClicked: event => {
                                         if (event.button === Qt.RightButton) {
-                                            root.togglePin(tile.modelData);
-                                            dock.tooltip = tile.pinned ? "已固定" : "已取消固定";
+                                            dock.openMenu(tile.modelData, mouse, event.x);
                                         } else root.activate(tile.modelData, event.button === Qt.MiddleButton || (event.modifiers & Qt.ShiftModifier));
                                     }
                                 }
@@ -419,7 +482,7 @@ ShellRoot {
                 width: Math.min(parent.width, tip.implicitWidth + 24)
                 height: 28; radius: 9
                 color: theme.tooltipBackground
-                visible: settings.showTooltips && dock.expanded && dock.tooltip !== ""
+                visible: settings.showTooltips && !dock.menuActive && dock.expanded && dock.tooltip !== ""
                 Text {
                     id: tip
                     anchors.centerIn: parent

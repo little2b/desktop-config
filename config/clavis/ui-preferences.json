@@ -311,39 +311,8 @@
   },
   "cloudBackupFoldersInitialized": true,
   "cloudBackupFoldersVersion": 3,
-  "cloudBackupFolders": [
-    {
-      "path": "@HOME@/桌面",
-      "enabled": true,
-      "kind": "desktop"
-    },
-    {
-      "path": "@HOME@/文档",
-      "enabled": true,
-      "kind": "documents"
-    },
-    {
-      "path": "@HOME@/下载",
-      "enabled": true,
-      "kind": "downloads"
-    },
-    {
-      "path": "@HOME@/音乐",
-      "enabled": true,
-      "kind": "music"
-    },
-    {
-      "path": "@HOME@/图片",
-      "enabled": true,
-      "kind": "pictures"
-    },
-    {
-      "path": "@HOME@/视频",
-      "enabled": true,
-      "kind": "videos"
-    }
-  ],
-  "cloudDefaultRemoteName": "谷歌",
+  "cloudBackupFolders": [],
+  "cloudDefaultRemoteName": "",
   "cloudBackupRoot": "Backups",
   "cloudUploadRoot": "Uploads",
   "recordingVideoDirectory": "@HOME@/视频/Recordings",

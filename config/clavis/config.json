@@ -195,7 +195,9 @@
     ]
   },
   "sidebar": {
-    "keepLoaded": true
+    "keepLoaded": true,
+    "dashboardSide": "left",
+    "quickSettingsSide": "right"
   },
   "desktopCards": {
     "gridSnapEnabled": true,

@@ -3,6 +3,8 @@ import hashlib
 import json
 from pathlib import Path
 import tempfile
+import configparser
+import shlex
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +32,12 @@ class RestoreTests(unittest.TestCase):
         (old_db / '999999.log').write_bytes(b'old database log')
         backup = restore.restore(self.target, same_hardware=True, apply=True)
         self.assertEqual((backup / '.config/quickshell/nyx-dock/settings.json').read_text(), '{"existing": true}')
+        desktop = configparser.ConfigParser(interpolation=None)
+        desktop.read(self.target / '.local/share/applications/org.kde.dolphin.desktop')
+        self.assertEqual(shlex.split(desktop['Desktop Entry']['Exec'])[0], str(self.target / '.local/bin/dolphin'))
+        desktop.read(self.target / '.local/share/applications/org.kde.konsole.desktop')
+        self.assertEqual(desktop['Desktop Entry']['TryExec'], '/usr/bin/konsole')
+        self.assertTrue((self.target / '.local/lib/nyx-dock/uninstall-app.py').is_file())
         config = json.loads((self.target / '.config/clavis/config.json').read_text())
         self.assertTrue(Path(config['wallpaper']['path']).is_file())
         self.assertEqual(config['wallpaper']['folder'], str(self.target / 'Pictures/Wallpapers'))
