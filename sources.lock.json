@@ -2,7 +2,7 @@
   "clavis": {
     "repository": "https://github.com/little2b/quickshell.git",
     "branch": "personal/fedora-niri",
-    "commit": "95ae6712c21b4d415fc3c9cdfaef456f75251000",
+    "commit": "b9838bf939623750d54c80a48b11a602c80f7a8c",
     "upstream_commit": "eb9e72480fb1b8d4b56af9cdc0a4fcd4fb244f5c"
   },
   "arch_installer": {

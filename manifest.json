@@ -9,7 +9,7 @@
     "config/Clavis/Weather.conf": "fdb727f2ddb2760385d0ada27a9cd3ab173bc0184ff651ceee3072130e0aa17e",
     "config/alacritty/alacritty.toml": "9934ded49e638c74f6b4fc6eede4f2ab491ceea6510e939494bcc905161a92ba",
     "config/alacritty/theme.toml": "f8cefa87473cdade7a420b5aedc91c24286a0f5771d72104cb907e750b75827d",
-    "config/clavis/config.json": "450d49f64c4a1cd6a3f982231762fbf62e5e04ad0bcea9c7df05f045ee930506",
+    "config/clavis/config.json": "c07f71593257cf8b14b51855a556de263ccc22bc964fd6a0c1e868f0dbfc9bd0",
     "config/clavis/idle-policy.json": "ac0f26868e60f51b60b3cca0f35e831b76b909e24158c953a373ba611221063d",
     "config/clavis/primary-display.json": "f6d69bf7172f73133cecf735f8aa88214902ce375bf45e250524afc92ac9703a",
     "config/clavis/quick-toggles.json": "eda48bb61569ff69d78fe88f74a411e3da1397ac99420e512253d9c39ebc316c",
@@ -200,7 +200,7 @@
     "share/fonts/clavis/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf": "f1472f172c0fc4a922be22972e4752ccc54fe795ed82564ab6f6b097782f2dbc",
     "share/fonts/clavis/OFL.txt": "30f0c136e3c88e422d0791acd97238870f9054a9729bc34cf2ff0d4ed8cac4ad",
     "share/icons/clavis-system/index.theme": "61f93d455cf941384f90ab8d3f167333070d9bb16cfa974987ff14e92cadf935",
-    "sources.lock.json": "d610731607b3e785de7306a0042f1b97d929e01fb283d9554c1c1beb33805200",
+    "sources.lock.json": "bee42c7ab2bb92a060f3043bfc39bfac3d088bd1d7f3bea5717b1cc85d64472a",
     "system-reference/hibernate-delay.conf": "36d14b8710ee2584b1c2e34252ad867722b4c9304e48dc5495231b7dbfa07806",
     "system-reference/logind-lid.conf": "757f977dce9eb8945e4201487f9ec18fc3b3fa5e4b7d576f539d141d061e3f95"
   }
