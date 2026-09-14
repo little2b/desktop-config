@@ -81,7 +81,7 @@
     "config/systemd/user/clavis-shell.service.d/30-icon-theme.conf": "8b21e299ce1aebf2c6af3166d8e4c19c46694b4c8092d03a11ccb0a91d18db11",
     "config/systemd/user/clavis-shell.service.d/40-memory.conf": "ceb163b8d9b7840c869eee56d22c2f65d8264c376e40a1e1645a4dc6a0a82240",
     "config/systemd/user/fcitx5-niri.service": "524022e482ba277a5b1fcb7155e6c81a7f98ec92fdd4d16af3a56eac92c2a153",
-    "config/systemd/user/fcitx5-niri.service.d/20-x11-dpi.conf": "d9cc90268de91d8ddc3ac63ad2066fd306297d98e5995f9a90b90b276823d86a",
+    "config/systemd/user/fcitx5-niri.service.d/20-x11-dpi.conf": "195049abb7e3aaee0d88e25a750c1917e910a9143279fa6859a7204b6381af3b",
     "config/systemd/user/nyx-dock.service": "b05b3a2b44699eb54aeb59a9bfc1a1e53fc6e41e6b52acd6253d0fc97be8fbdb",
     "config/systemd/user/nyx-theme-sync.path": "a736a49b3b168433f2a501ffc21f739b48b6d658383bd641b17c39f3c91a7022",
     "config/systemd/user/nyx-theme-sync.service": "a4710b5d974819bb35cd6b4ac7e9221b8cc6b09de9fc183032dff5b9bb1ba5dd",

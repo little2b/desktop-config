@@ -25,6 +25,9 @@ class RestoreTests(unittest.TestCase):
         destination = self.target / '.config/quickshell/nyx-dock/settings.json'
         destination.parent.mkdir(parents=True)
         destination.write_text('{"existing": true}')
+        old_db = self.target / '.local/share/fcitx5/rime/rime_ice.userdb'
+        old_db.mkdir(parents=True)
+        (old_db / '999999.log').write_bytes(b'old database log')
         backup = restore.restore(self.target, same_hardware=True, apply=True)
         self.assertEqual((backup / '.config/quickshell/nyx-dock/settings.json').read_text(), '{"existing": true}')
         config = json.loads((self.target / '.config/clavis/config.json').read_text())
@@ -37,6 +40,8 @@ class RestoreTests(unittest.TestCase):
         self.assertEqual((self.target / '.config/niri/clavis/outputs.kdl').read_bytes(), (ROOT / 'hardware/outputs.kdl').read_bytes())
         self.assertTrue((self.target / '.local/share/fcitx5/rime/rime_ice.userdb/CURRENT').is_file())
         self.assertTrue(list((self.target / '.local/share/fcitx5/rime/rime_ice.userdb').glob('*.log')))
+        self.assertFalse((old_db / '999999.log').exists())
+        self.assertEqual((backup / '.local/share/fcitx5/rime/rime_ice.userdb/999999.log').read_bytes(), b'old database log')
 
     def test_new_hardware_resets_monitor_bindings(self):
         files = restore.plan(self.target, same_hardware=False)

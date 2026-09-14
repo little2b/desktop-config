@@ -98,6 +98,17 @@ def restore(target_home, same_hardware=False, apply=False, root=ROOT):
         for unit in ['clavis-shell.service', 'nyx-dock.service', 'fcitx5-niri.service']:
             if subprocess.run(['systemctl', '--user', 'is-active', '--quiet', unit], check=False).returncode == 0:
                 active_units.append(unit)
+        # Fcitx may have been started by desktop autostart rather than this unit.
+        for entry in Path('/proc').iterdir():
+            if not entry.name.isdigit():
+                continue
+            try:
+                if entry.stat().st_uid == os.getuid() and (entry / 'comm').read_text().strip() == 'fcitx5':
+                    if 'fcitx5-niri.service' not in active_units:
+                        active_units.append('fcitx5 (desktop autostart)')
+                    break
+            except (OSError, UnicodeError):
+                continue
         if active_units:
             raise RuntimeError('Stop these services before restoring to an active desktop: ' + ', '.join(active_units))
     target_home.mkdir(parents=True, exist_ok=True)
@@ -105,6 +116,15 @@ def restore(target_home, same_hardware=False, apply=False, root=ROOT):
     backup_root = target_home / '.local/state/desktop-config-backups'
     backup_root.mkdir(parents=True, exist_ok=True)
     backup = Path(tempfile.mkdtemp(prefix=datetime.now().strftime('%Y%m%d-%H%M%S-'), dir=backup_root))
+    # LevelDB snapshots must replace whole databases, never merge stale WAL/SST files.
+    databases = {Path(*relative.parts[:index + 1]) for relative in files
+                 for index, part in enumerate(relative.parts) if part.endswith('.userdb')}
+    for relative in sorted(databases):
+        path = destination(target_home, relative / '.guard').parent
+        if path.exists():
+            old = backup / relative
+            old.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(path), str(old))
     for relative, (data, mode) in files.items():
         path = destination(target_home, relative)
         path.parent.mkdir(parents=True, exist_ok=True)
