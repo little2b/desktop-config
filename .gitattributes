@@ -1,0 +1,14 @@
+# Keep checksummed resource bytes stable even with core.autocrlf enabled.
+config/** -text
+share/** -text
+lib/** -text
+bin/** -text
+rime/** -text
+assets/** -text
+hardware/** -text
+system-reference/** -text
+sources.lock.json -text
+scripts/** text eol=lf
+tests/** text eol=lf
+*.md text eol=lf
+manifest.json text eol=lf
