@@ -1,0 +1,15 @@
+[Unit]
+Description=Fcitx 5 input method for niri
+Requisite=niri.service
+PartOf=niri.service
+After=niri.service
+
+[Service]
+Type=dbus
+BusName=org.fcitx.Fcitx5
+ExecStart=/usr/bin/fcitx5 -D
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=niri.service

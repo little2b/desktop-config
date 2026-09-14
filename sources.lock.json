@@ -1,0 +1,21 @@
+{
+  "clavis": {
+    "repository": "https://github.com/little2b/quickshell.git",
+    "branch": "personal/fedora-niri",
+    "commit": "95ae6712c21b4d415fc3c9cdfaef456f75251000",
+    "upstream_commit": "eb9e72480fb1b8d4b56af9cdc0a4fcd4fb244f5c"
+  },
+  "arch_installer": {
+    "repository": "StatIndet/quickshell",
+    "release": "v2026.9.12"
+  },
+  "rime_ice": {
+    "repository": "https://github.com/iDvel/rime-ice",
+    "snapshot": "2026-09-14"
+  },
+  "platform_before_migration": {
+    "distribution": "Fedora 44",
+    "niri": "26.04",
+    "qt": "6.11.2"
+  }
+}

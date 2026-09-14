@@ -1,0 +1,6 @@
+{
+  "systemMonitorGpuId": "auto",
+  "systemMonitorDiskDevice": "",
+  "systemMonitorNetworkInterface": "",
+  "storageCapacityDiskDevice": "follow-io"
+}

@@ -1,0 +1,3 @@
+#!/bin/sh
+export QT_QPA_PLATFORMTHEME=kde
+exec /usr/bin/konsole "$@"

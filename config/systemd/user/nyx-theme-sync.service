@@ -1,0 +1,6 @@
+[Unit]
+Description=Follow Clavis colors in Dolphin and terminals
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.local/lib/nyx-desktop-style/sync-theme.py

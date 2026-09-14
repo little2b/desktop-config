@@ -1,0 +1,17 @@
+[Unit]
+Description=Nyx-inspired bottom Dock for Niri
+Requisite=niri.service
+PartOf=niri.service
+After=niri.service
+StartLimitIntervalSec=30
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/qs -c nyx-dock -n --no-color
+Restart=always
+RestartSec=2
+TimeoutStopSec=10
+
+[Install]
+WantedBy=niri.service

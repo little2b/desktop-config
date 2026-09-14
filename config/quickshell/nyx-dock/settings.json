@@ -1,0 +1,25 @@
+{
+    "autoHide": false,
+    "backgroundOpacity": 77,
+    "bottomMargin": 4,
+    "cornerRadius": 10,
+    "enabled": true,
+    "hideDelay": 650,
+    "hoverZoom": true,
+    "iconSize": 34,
+    "ignoredApps": [
+        "xwaylandvideobridge"
+    ],
+    "output": "",
+    "pinned": [
+        "google-chrome",
+        "chatgpt",
+        "qq",
+        "wechat"
+    ],
+    "showIndicators": true,
+    "showRunning": true,
+    "showTooltips": true,
+    "smartAutoHide": true,
+    "spacing": 8
+}

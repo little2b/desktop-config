@@ -1,0 +1,29 @@
+# Typography and spacing; colors follow Clavis automatically.
+[general]
+import = ["@HOME@/.config/alacritty/theme.toml"]
+live_config_reload = true
+
+[window]
+padding = { x = 16, y = 14 }
+dynamic_padding = true
+decorations = "None"
+opacity = 0.94
+dynamic_title = true
+
+[font]
+size = 12.0
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold = { family = "JetBrainsMono Nerd Font", style = "Bold" }
+italic = { family = "JetBrainsMono Nerd Font", style = "Italic" }
+
+[cursor]
+style = { shape = "Beam", blinking = "On" }
+blink_interval = 600
+unfocused_hollow = true
+
+[scrolling]
+history = 10000
+
+[selection]
+save_to_clipboard = false
+
