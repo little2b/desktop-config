@@ -16,4 +16,3 @@ ScrollBarPosition=2
 [Cursor Options]
 CursorShape=1
 BlinkingCursorEnabled=true
-

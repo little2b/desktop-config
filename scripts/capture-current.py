@@ -58,6 +58,8 @@ def capture(home, root=ROOT):
         if path.suffix == '.desktop':
             content = re.sub(r'^Exec=(@HOME@/\.local/bin/[^\s"]+)(.*)$', r'Exec="\1"\2', content, flags=re.M)
             content = re.sub(r'^TryExec=@HOME@/\.local/bin/([^\s]+)$', r'TryExec=/usr/bin/\1', content, flags=re.M)
+        if path.suffix in ('.colors', '.colorscheme', '.profile'):
+            content = content.rstrip('\n') + '\n'
         put(relative, content)
         (root / relative).chmod(path.stat().st_mode & 0o777)
 
