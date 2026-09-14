@@ -685,7 +685,7 @@ layer-rule {
 spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
 
 environment {
-    CLAVIS_DISABLE_CLOUD "1"
+    CLAVIS_DISABLE_CLOUD "0"
     GTK_IM_MODULE "fcitx"
     QT_IM_MODULE "fcitx"
     XMODIFIERS "@im=fcitx"

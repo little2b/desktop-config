@@ -5,7 +5,7 @@ repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 [[ $(id -u) -ne 0 ]] || { echo 'Run as your desktop user, not root.' >&2; exit 1; }
 command -v python3 >/dev/null || { echo 'Install python first: sudo pacman -Syu --needed git github-cli python curl' >&2; exit 1; }
 # Arch librime includes librime-lua.so; it is not a separate librime-lua package.
-sudo pacman -Syu --needed git python curl github-cli fcitx5 fcitx5-rime fcitx5-configtool \
+sudo pacman -Syu --needed git python curl github-cli rclone fcitx5 fcitx5-rime fcitx5-configtool \
     fcitx5-gtk fcitx5-qt librime xorg-xrdb xwayland-satellite \
     xdg-desktop-portal-gnome xdg-desktop-portal-gtk xdg-user-dirs \
     polkit-kde-agent breeze breeze-gtk plasma-integration dolphin konsole alacritty fuzzel \

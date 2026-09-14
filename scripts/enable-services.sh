@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
-for command in niri qs key keytop fcitx5; do
+for command in niri qs key keytop fcitx5 rclone; do
     command -v "$command" >/dev/null || { echo "Missing command: $command" >&2; exit 1; }
 done
 [[ -x /usr/bin/key ]] || { echo 'Install the Arch key-cli backend first.' >&2; exit 1; }
