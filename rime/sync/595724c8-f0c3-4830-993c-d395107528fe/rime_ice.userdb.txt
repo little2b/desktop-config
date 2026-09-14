@@ -2,157 +2,184 @@
 #@/db_name	rime_ice
 #@/db_type	userdb
 #@/rime_version	1.16.1
-#@/tick	231
+#@/tick	292
 #@/user_id	595724c8-f0c3-4830-993c-d395107528fe
-ai chui 	爱吹	c=1 d=0.814647 t=231
-bang wo 	帮我	c=1 d=0.995012 t=231
-bao chi 	保持	c=1 d=0.923116 t=231
-bao zheng 	保证	c=1 d=0.960789 t=231
-bei 	被	c=2 d=1.52295 t=231
-ben di 	本地	c=1 d=0.878095 t=231
-ben ji 	本季	c=1 d=0.97531 t=231
-ben ji 	本机	c=1 d=0.980199 t=231
-bian de 	变得	c=1 d=0.826959 t=231
-bian yu 	便于	c=1 d=0.932394 t=231
-bu liu chang 	不流畅	c=1 d=0.980199 t=231
-bu shi 	不是	c=1 d=0.941765 t=231
-can liu 	残留	c=1 d=0.99005 t=231
-cao zuo 	操作	c=1 d=1 t=231
-chong qing 	重庆	c=1 d=0.839457 t=231
-chou ti 	抽屉	c=1 d=0.95461 t=231
-chou ti lan 	抽屉栏	c=2 d=1.82807 t=231
-chu xian 	出现	c=1 d=0.970446 t=231
-ci wai 	此外	c=1 d=0.941765 t=231
-dao 	到	c=1 d=0.913931 t=231
-dao le 	到了	c=1 d=0.891366 t=231
-de 	地	c=1 d=0.99005 t=231
-de 	的	c=13 d=7.68819 t=231
-deng deng 	等等	c=1 d=0.946485 t=231
-di qu 	地区	c=1 d=0.810584 t=231
-dian nao 	电脑	c=1 d=0.763379 t=231
-dong hua 	动画	c=1 d=0.970446 t=231
-du li 	独立	c=1 d=0.895834 t=231
-dui wo 	对我	c=1 d=0.701173 t=231
-er shi 	而是	c=1 d=0.955997 t=231
-fen bian lv 	分辨率	c=1 d=0.66365 t=231
-gai dao 	改到	c=2 d=1.6624 t=231
-gai hui 	改回	c=1 d=0.83527 t=231
-gai zao 	改造	c=1 d=0.847894 t=231
-ge 	个	c=1 d=0.628135 t=231
-geng fang bian 	更方便	c=1 d=0.985112 t=231
-geng huan 	更换	c=2 d=1.92605 t=231
-geng xin 	更新	c=6 d=3.39745 t=231
-hai you 	还有	c=2 d=1.55895 t=231
-hao xiang 	好像	c=1 d=0.985112 t=231
-he 	和	c=2 d=1.32648 t=231
-he bing 	合并	c=1 d=0.909373 t=231
-he wo 	和我	c=1 d=0.970446 t=231
-hua dong 	滑动	c=3 d=2.84442 t=231
-hua sheng dun 	华盛顿	c=1 d=0.831104 t=231
-huan jing 	环境	c=1 d=0.826959 t=231
-hui 	会	c=2 d=1.55262 t=231
-ji 	级	c=0 d=0.088692 t=231
-ji ni xing 	级逆行	c=1 d=0.891366 t=231
-ji xiang ning 	纪向宁	c=1 d=0.895834 t=231
-ji yu 	基于	c=1 d=0.83527 t=231
-jiang 	将	c=4 d=2.34111 t=231
-jin xing 	进行	c=3 d=1.94774 t=231
-jing chang 	经常	c=1 d=0.960789 t=231
-jiu mei you 	就没有	c=1 d=0.904837 t=231
-kan a 	看啊	c=0 d=0.0856415 t=231
-kan a ke neng 	看啊可能	c=1 d=0.860708 t=231
-kan dao 	看到	c=1 d=0.782705 t=231
-kan kan 	看看	c=1 d=0.865022 t=231
-ke neng 	可能	c=0 d=0.0856415 t=231
-kong zhi 	控制	c=1 d=0.806541 t=231
-lai 	来	c=9 d=5.96779 t=231
-lan 	栏	c=3 d=2.65947 t=231
-le 	了	c=4 d=2.85645 t=231
-li 	里	c=0 d=0.0782705 t=231
-li mai nong 	里卖弄	c=1 d=0.786628 t=231
-li mian 	里面	c=1 d=0.794534 t=231
-liang ce 	两侧	c=1 d=0.951229 t=231
-ma 	吗	c=1 d=0.927743 t=231
-mai nong 	卖弄	c=0 d=0.0782705 t=231
-mei you 	没有	c=1 d=0.900325 t=231
-na xie 	哪些	c=1 d=0.722527 t=231
-na xie 	那些	c=1 d=0.718924 t=231
-nei rong 	内容	c=1 d=0.697676 t=231
-neng fou 	能否	c=2 d=1.47562 t=231
-ni xing 	逆行	c=0 d=0.088692 t=231
-pei zhi 	配置	c=1 d=0.88692 t=231
-qi 	器	c=1 d=0.65377 t=231
-qie huan 	切换	c=1 d=1 t=231
-qing kuang 	情况	c=1 d=1 t=231
-qu 	区	c=1 d=0.852144 t=231
-quan bu 	全部	c=1 d=0.755784 t=231
-reng ran 	仍然	c=1 d=0.985112 t=231
-ru guo 	如果	c=1 d=0.852144 t=231
-ru he 	如何	c=2 d=1.5542 t=231
-sha ping ba 	沙坪坝	c=1 d=0.847894 t=231
-shan chu 	删除	c=0 d=0.0900325 t=231
-shan chu geng huan 	删除更换	c=1 d=0.904837 t=231
-shan shuo 	闪烁	c=1 d=1 t=231
-shang chuan 	上传	c=2 d=1.86537 t=231
-shang mian 	上面	c=1 d=0.923116 t=231
-shang yo 	上哟	c=1 d=0.960789 t=231
-shang you 	上游	c=3 d=1.71116 t=231
-she zhi 	设置	c=2 d=1.47344 t=231
-shen me 	什么	c=1 d=0.904837 t=231
-shi 	时	c=4 d=2.21902 t=231
-shi 	是	c=3 d=1.82112 t=231
-shi fou 	是否	c=2 d=1.51228 t=231
-shi hou 	时候	c=1 d=0.814647 t=231
-shi jian 	时间	c=1 d=0.882497 t=231
-shi yong 	使用	c=3 d=2.20483 t=231
-shou hui qu 	收回去	c=1 d=0.97531 t=231
-shu biao 	鼠标	c=1 d=0.818731 t=231
-shui mian 	睡眠	c=1 d=0.771052 t=231
-te bie ju da 	特别巨大	c=1 d=0.831104 t=231
-tong shi 	同时	c=1 d=0.909373 t=231
-tong yi 	同意	c=1 d=0.847894 t=231
-tong zhi 	通知	c=2 d=1.55454 t=231
-tui chu 	推出	c=1 d=0.839457 t=231
-tui chu 	退出	c=1 d=0.843665 t=231
-wei shen me 	为什么	c=1 d=0.644036 t=231
-wen ti 	问题	c=2 d=1.26891 t=231
-wo 	我	c=3 d=1.95442 t=231
-wo de 	我的	c=6 d=4.2276 t=231
-wo fa xian 	我发现	c=2 d=1.5177 t=231
-wo gang cai 	我刚才	c=1 d=0.856415 t=231
-wo wu fa 	我无法	c=1 d=0.923116 t=231
-wo zai 	我在	c=1 d=0.794534 t=231
-wu fa 	无法	c=2 d=1.35575 t=231
-xian jie 	衔接	c=1 d=0.97531 t=231
-xian shi 	显示	c=2 d=1.30756 t=231
-xian zai 	现在	c=4 d=2.64638 t=231
-xiang mu 	项目	c=3 d=2.64513 t=231
-xiang xia 	向下	c=1 d=0.927743 t=231
-xiu gai 	修改	c=4 d=2.22318 t=231
-xiu mian 	休眠	c=1 d=0.778801 t=231
-ye 	也	c=1 d=0.951229 t=231
-ye ke yi 	也可以	c=1 d=0.869358 t=231
-yi ban 	一半	c=1 d=0.683861 t=231
-yi dong 	移动	c=1 d=0.88692 t=231
-yi er guang 	一耳光	c=1 d=0.625002 t=231
-yi hou de 	以后的	c=1 d=0.941765 t=231
-yi tong guo 	已通过	c=1 d=0.852144 t=231
-yi zhi 	一直	c=1 d=0.99005 t=231
-you bei 	又被	c=1 d=0.814647 t=231
-you wen ti 	有问题	c=1 d=0.918512 t=231
-yu wo 	与我	c=1 d=0.873716 t=231
-yuan cheng 	远程	c=1 d=0.802519 t=231
-yuan kong 	远控	c=1 d=0.847894 t=231
-zai 	在	c=2 d=1.72246 t=231
-zhe die 	折叠	c=1 d=0.767206 t=231
-zhe ge 	这个	c=3 d=2.63193 t=231
-zhe tao 	这套	c=1 d=0.878095 t=231
-zheng chan 	正产	c=1 d=0.67032 t=231
-zheng chang 	正常	c=2 d=1.29275 t=231
-zhi hou 	之后	c=2 d=1.72101 t=231
-zhi qian 	之前	c=1 d=0.786628 t=231
-zhong 	中	c=2 d=1.80611 t=231
-zhong de 	中的	c=1 d=0.748264 t=231
-zhuo mian 	桌面	c=3 d=1.93863 t=231
-zong he 	综合	c=1 d=0.955997 t=231
-zuo ce 	左侧	c=1 d=0.740818 t=231
+ai chui 	爱吹	c=1 d=0.814647 t=292
+an zhuang 	安装	c=1 d=0.970446 t=292
+bang wo 	帮我	c=1 d=0.995012 t=292
+bao chi 	保持	c=1 d=0.923116 t=292
+bao zheng 	保证	c=1 d=0.960789 t=292
+bei 	被	c=2 d=1.52295 t=292
+ben di 	本地	c=3 d=2.70022 t=292
+ben ji 	本季	c=1 d=0.97531 t=292
+ben ji 	本机	c=1 d=0.980199 t=292
+bian de 	变得	c=1 d=0.826959 t=292
+bian yu 	便于	c=1 d=0.932394 t=292
+bu liu chang 	不流畅	c=1 d=0.980199 t=292
+bu shi 	不是	c=1 d=0.941765 t=292
+can liu 	残留	c=1 d=0.99005 t=292
+cao zuo 	操作	c=1 d=1 t=292
+chong qing 	重庆	c=1 d=0.839457 t=292
+chou ti 	抽屉	c=1 d=0.95461 t=292
+chou ti lan 	抽屉栏	c=2 d=1.82807 t=292
+chu xian 	出现	c=1 d=0.970446 t=292
+ci wai 	此外	c=1 d=0.941765 t=292
+dan du 	单独	c=1 d=1 t=284
+dao 	到	c=3 d=2.71308 t=292
+dao le 	到了	c=1 d=0.891366 t=292
+de 	地	c=1 d=0.99005 t=292
+de 	的	c=18 d=10.12 t=292
+deng deng 	等等	c=1 d=0.946485 t=292
+di qu 	地区	c=1 d=0.810584 t=292
+dian an 	点按	c=0 d=0.1 t=272
+dian an o 	点按哦	c=1 d=1 t=273
+dian nao 	电脑	c=2 d=1.5968 t=292
+dong hua 	动画	c=1 d=0.970446 t=292
+dou mei you 	都没有	c=1 d=0.97531 t=292
+du li 	独立	c=1 d=0.895834 t=292
+dui wo 	对我	c=1 d=0.701173 t=292
+er shi 	而是	c=1 d=0.955997 t=292
+fen bian lv 	分辨率	c=1 d=0.66365 t=292
+fu wu qi 	服务器	c=1 d=1 t=286
+gai dao 	改到	c=2 d=1.6624 t=292
+gai hui 	改回	c=1 d=0.83527 t=292
+gai zao 	改造	c=1 d=0.847894 t=292
+ge 	个	c=1 d=0.628135 t=292
+gei wo 	给我	c=1 d=0.965605 t=292
+geng fang bian 	更方便	c=1 d=0.985112 t=292
+geng huan 	更换	c=2 d=1.92605 t=292
+geng xin 	更新	c=8 d=5.17273 t=292
+gong neng 	功能	c=1 d=0.965605 t=292
+gu ge 	谷歌	c=3 d=2.96531 t=272
+hai you 	还有	c=2 d=1.55895 t=292
+hao xiang 	好像	c=1 d=0.985112 t=292
+he 	和	c=2 d=1.32648 t=292
+he bing 	合并	c=1 d=0.909373 t=292
+he wo 	和我	c=1 d=0.970446 t=292
+hua dong 	滑动	c=3 d=2.84442 t=292
+hua sheng dun 	华盛顿	c=1 d=0.831104 t=292
+huan jing 	环境	c=3 d=2.65854 t=292
+hui 	会	c=2 d=1.55262 t=292
+ji 	级	c=0 d=0.088692 t=292
+ji ni xing 	级逆行	c=1 d=0.891366 t=292
+ji xiang ning 	纪向宁	c=1 d=0.895834 t=292
+ji yu 	基于	c=1 d=0.83527 t=292
+jia ru 	加入	c=1 d=0.980199 t=292
+jiang 	将	c=5 d=3.13554 t=292
+jin xing 	进行	c=3 d=1.94774 t=292
+jing chang 	经常	c=1 d=0.960789 t=292
+jiu mei you 	就没有	c=1 d=0.904837 t=292
+kan a 	看啊	c=0 d=0.0856415 t=292
+kan a ke neng 	看啊可能	c=1 d=0.860708 t=292
+kan dao 	看到	c=1 d=0.782705 t=292
+kan kan 	看看	c=1 d=0.865022 t=292
+ke neng 	可能	c=0 d=0.0856415 t=292
+kong zhi 	控制	c=1 d=0.806541 t=292
+lai 	来	c=9 d=5.96779 t=292
+lan 	栏	c=3 d=2.65947 t=292
+le 	了	c=4 d=2.85645 t=292
+li 	里	c=0 d=0.0782705 t=292
+li mai nong 	里卖弄	c=1 d=0.786628 t=292
+li mian 	里面	c=1 d=0.794534 t=292
+liang ce 	两侧	c=1 d=0.951229 t=292
+ma 	吗	c=3 d=2.63661 t=292
+mai nong 	卖弄	c=0 d=0.0782705 t=292
+me 	么	c=1 d=1 t=281
+mei you 	没有	c=1 d=0.900325 t=292
+na xie 	哪些	c=1 d=0.722527 t=292
+na xie 	那些	c=1 d=0.718924 t=292
+nei rong 	内容	c=2 d=1.63409 t=292
+neng fou 	能否	c=4 d=3.14391 t=292
+ni xing 	逆行	c=0 d=0.088692 t=292
+ni you 	你有	c=1 d=0.97531 t=292
+o 	哦	c=0 d=0.1 t=272
+pei zhi 	配置	c=2 d=1.73393 t=292
+qi 	器	c=1 d=0.65377 t=292
+qie huan 	切换	c=1 d=1 t=292
+qing kuang 	情况	c=1 d=1 t=292
+qu 	区	c=1 d=0.852144 t=292
+quan bu 	全部	c=1 d=0.755784 t=292
+reng ran 	仍然	c=1 d=0.985112 t=292
+ru guo 	如果	c=1 d=0.852144 t=292
+ru he 	如何	c=3 d=2.26741 t=292
+sha ping ba 	沙坪坝	c=1 d=0.847894 t=292
+shan chu 	删除	c=0 d=0.0900325 t=292
+shan chu geng huan 	删除更换	c=1 d=0.904837 t=292
+shan shuo 	闪烁	c=1 d=1 t=292
+shang chuan 	上传	c=3 d=2.63624 t=292
+shang mian 	上面	c=1 d=0.923116 t=292
+shang yo 	上哟	c=1 d=0.960789 t=292
+shang you 	上游	c=5 d=3.36759 t=292
+she zhi 	设置	c=2 d=1.47344 t=292
+shen me 	什么	c=1 d=0.904837 t=292
+shi 	时	c=4 d=2.21902 t=292
+shi 	是	c=3 d=1.82112 t=292
+shi fou 	是否	c=2 d=1.51228 t=292
+shi hou 	时候	c=1 d=0.814647 t=292
+shi jian 	时间	c=1 d=0.882497 t=292
+shi yong 	使用	c=4 d=2.87815 t=292
+shou hui qu 	收回去	c=1 d=0.97531 t=292
+shu biao 	鼠标	c=1 d=0.818731 t=292
+shui mian 	睡眠	c=1 d=0.771052 t=292
+si hu 	似乎	c=1 d=0.970446 t=292
+te bie ju da 	特别巨大	c=1 d=0.831104 t=292
+tian jia 	添加	c=1 d=1 t=271
+tong bu 	同步	c=1 d=1 t=289
+tong shi 	同时	c=1 d=0.909373 t=292
+tong yi 	同意	c=1 d=0.847894 t=292
+tong zhi 	通知	c=2 d=1.55454 t=292
+tui chu 	推出	c=1 d=0.839457 t=292
+tui chu 	退出	c=1 d=0.843665 t=292
+wang pan 	网盘	c=1 d=0.955997 t=292
+wei ruan 	微软	c=1 d=1 t=292
+wei shen me 	为什么	c=1 d=0.644036 t=292
+wen ti 	问题	c=2 d=1.26891 t=292
+wo 	我	c=4 d=2.81162 t=292
+wo de 	我的	c=9 d=6.02124 t=292
+wo fa xian 	我发现	c=2 d=1.5177 t=292
+wo gang cai 	我刚才	c=1 d=0.856415 t=292
+wo kan dao 	我看到	c=1 d=0.941765 t=292
+wo wu fa 	我无法	c=1 d=0.923116 t=292
+wo xu a yi 	我徐阿姨	c=1 d=1 t=288
+wo zai 	我在	c=1 d=0.794534 t=292
+wu fa 	无法	c=2 d=1.35575 t=292
+xian jie 	衔接	c=1 d=0.97531 t=292
+xian shi 	显示	c=2 d=1.30756 t=292
+xian zai 	现在	c=4 d=2.64638 t=292
+xiang mu 	项目	c=3 d=2.64513 t=292
+xiang xia 	向下	c=1 d=0.927743 t=292
+xin neng neng 	新能能	c=1 d=0.960789 t=292
+xiu gai 	修改	c=4 d=2.22318 t=292
+xiu mian 	休眠	c=1 d=0.778801 t=292
+xu a yi 	徐阿姨	c=0 d=0.1 t=287
+xu yao 	需要	c=1 d=1 t=283
+yao 	要	c=1 d=1 t=280
+ye 	也	c=2 d=1.85215 t=292
+ye ke yi 	也可以	c=1 d=0.869358 t=292
+yi ban 	一半	c=1 d=0.683861 t=292
+yi dong 	移动	c=1 d=0.88692 t=292
+yi er guang 	一耳光	c=1 d=0.625002 t=292
+yi hou de 	以后的	c=1 d=0.941765 t=292
+yi tong guo 	已通过	c=1 d=0.852144 t=292
+yi zhi 	一直	c=1 d=0.99005 t=292
+you bei 	又被	c=1 d=0.814647 t=292
+you hen duo 	有很多	c=1 d=0.946485 t=292
+you wen ti 	有问题	c=1 d=0.918512 t=292
+yu wo 	与我	c=1 d=0.873716 t=292
+yuan ban 	原版	c=1 d=0.951229 t=292
+yuan cheng 	远程	c=2 d=1.64528 t=292
+yuan kong 	远控	c=1 d=0.847894 t=292
+zai 	在	c=2 d=1.72246 t=292
+zhe die 	折叠	c=1 d=0.767206 t=292
+zhe ge 	这个	c=3 d=2.63193 t=292
+zhe tai 	这台	c=1 d=1 t=275
+zhe tao 	这套	c=1 d=0.878095 t=292
+zheng chan 	正产	c=1 d=0.67032 t=292
+zheng chang 	正常	c=2 d=1.29275 t=292
+zhi hou 	之后	c=2 d=1.72101 t=292
+zhi qian 	之前	c=1 d=0.786628 t=292
+zhong 	中	c=3 d=2.69245 t=292
+zhong de 	中的	c=1 d=0.748264 t=292
+zhuo mian 	桌面	c=5 d=3.62505 t=292
+zong he 	综合	c=1 d=0.955997 t=292
+zuo ce 	左侧	c=1 d=0.740818 t=292
