@@ -2,7 +2,7 @@
   "clavis": {
     "repository": "https://github.com/little2b/quickshell.git",
     "branch": "personal/fedora-niri",
-    "commit": "b9838bf939623750d54c80a48b11a602c80f7a8c",
+    "commit": "9a0be4549b066869da4cbf18f57bbb2b569e7aa4",
     "upstream_commit": "eb9e72480fb1b8d4b56af9cdc0a4fcd4fb244f5c"
   },
   "arch_installer": {
@@ -19,6 +19,6 @@
     "qt": "6.11.2"
   },
   "desktop_snapshot": {
-    "captured_at": "2026-09-14T23:53:32+08:00"
+    "captured_at": "2026-09-15T08:52:05+08:00"
   }
 }

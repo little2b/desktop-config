@@ -212,7 +212,7 @@
     "share/icons/clavis-system/index.theme": "61f93d455cf941384f90ab8d3f167333070d9bb16cfa974987ff14e92cadf935",
     "share/konsole/NyxTheme-1165ff373da4.colorscheme": "ef8cf374afea135a617e84c6e337011afec11288d88e6170ef6bf194e938c3f8",
     "share/konsole/NyxTheme-1165ff373da4.profile": "0e7194483df3ed28bdca7b5b27e5785ae919dca4aeb94ca23c65539c303e03aa",
-    "sources.lock.json": "72be4a0bafa6ca64dd1e616de2f471ee9ab6513e05432f4c365f658461216f0c",
+    "sources.lock.json": "e92869b59cb758522cde645103a40f5fe34cc5539f83ee7e3f21c86516b2c8a4",
     "system-reference/hibernate-delay.conf": "36d14b8710ee2584b1c2e34252ad867722b4c9304e48dc5495231b7dbfa07806",
     "system-reference/logind-lid.conf": "757f977dce9eb8945e4201487f9ec18fc3b3fa5e4b7d576f539d141d061e3f95"
   }
