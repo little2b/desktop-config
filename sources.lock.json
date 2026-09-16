@@ -2,7 +2,7 @@
   "clavis": {
     "repository": "https://github.com/little2b/quickshell.git",
     "branch": "personal/fedora-niri",
-    "commit": "9a0be4549b066869da4cbf18f57bbb2b569e7aa4",
+    "commit": "21f7601885454deb9fa76c262f4ac80aa99e9ea2",
     "upstream_commit": "eb9e72480fb1b8d4b56af9cdc0a4fcd4fb244f5c"
   },
   "arch_installer": {
@@ -18,7 +18,12 @@
     "niri": "26.04",
     "qt": "6.11.2"
   },
+  "platform_after_migration": {
+    "distribution": "CachyOS",
+    "niri_package": "niri-git 26.04.r125.g2f87f38-1",
+    "niri_commit": "2f87f3846bf9e6e7e02db398bee1b42dc24b106f"
+  },
   "desktop_snapshot": {
-    "captured_at": "2026-09-15T08:52:05+08:00"
+    "captured_at": "2026-09-17T00:01:31+08:00"
   }
 }

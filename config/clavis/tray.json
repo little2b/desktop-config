@@ -2,7 +2,12 @@
   "showItemId": false,
   "invertPinnedItems": true,
   "pinnedItems": [
-    "Fcitx"
+    "Fcitx",
+    "tray-icon tray app clash-verge-rev-tray",
+    "Cachy-Update",
+    "tailscale",
+    "tray-icon tray app main-tray",
+    "remmina-icon"
   ],
   "filterPassive": true
 }

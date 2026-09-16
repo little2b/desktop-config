@@ -11,6 +11,12 @@ sudo pacman -Syu --needed git python curl github-cli rclone fcitx5 fcitx5-rime f
     polkit polkit-kde-agent flatpak breeze breeze-gtk plasma-integration dolphin konsole alacritty fuzzel \
     noto-fonts noto-fonts-cjk noto-fonts-emoji fontconfig kconfig python-gobject \
     wl-clipboard swaylock playerctl brightnessctl
+# CachyOS and other configured repositories may provide a current niri-git
+# package. Install it before the upstream resolver so its `niri` provide is
+# used; plain Arch falls back to the stable niri package from the installer.
+if pacman -Si niri-git >/dev/null 2>&1; then
+    sudo pacman -S --needed niri-git
+fi
 release=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["arch_installer"]["release"])' "$repo_dir/sources.lock.json")
 task_tmp=$(mktemp -d)
 trap 'rm -rf -- "$task_tmp"' EXIT

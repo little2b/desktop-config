@@ -161,11 +161,22 @@ ShellRoot {
         configFile.writeAdapter();
         rebuild();
     }
+    function launchApplication(app) {
+        if (!app) return;
+        const command = Array.from(app.command || []);
+        if (command.length === 0 || !String(command[0]).trim()) return;
+        const argv = ["systemd-run", "--user", "--scope", "--collect", "--quiet", "--slice=app.slice",
+            "--expand-environment=no"];
+        if (app.workingDirectory) argv.push("--working-directory=" + String(app.workingDirectory));
+        argv.push("--");
+        if (app.runInTerminal) argv.push("/usr/bin/alacritty", "-e");
+        Quickshell.execDetached(argv.concat(command));
+    }
     function activate(id, newWindow) {
         const wins = appWindows(id).slice().sort((a, b) => a.id - b.id);
         if (newWindow || wins.length === 0) {
             const app = entry(id);
-            if (app) app.execute();
+            root.launchApplication(app);
             return;
         }
         const current = wins.findIndex(w => w.is_focused);

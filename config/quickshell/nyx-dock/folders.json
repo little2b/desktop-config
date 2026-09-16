@@ -2,6 +2,27 @@
   "version": 1,
   "folders": [
     {
+      "id": "folder-mu2cdoca-yb4sn",
+      "name": "不知道干嘛的",
+      "apps": [
+        "qdbusviewer",
+        "assistant",
+        "linguist",
+        "qv4l2",
+        "designer",
+        "org.cachyos.scx-manager",
+        "vim",
+        "com.shellyorg.shelly",
+        "qvidcap",
+        "micro",
+        "org.gnome.Meld",
+        "org.kde.kate",
+        "avahi-discover",
+        "bvnc",
+        "bssh"
+      ]
+    },
+    {
       "id": "folder-mu1cus84-kriq6",
       "name": "libre",
       "apps": [
@@ -91,7 +112,9 @@
         "qt6-linguist",
         "setroubleshoot",
         "org.kde.skanpage",
-        "org.kde.spectacle"
+        "org.kde.spectacle",
+        "btop",
+        "btrfs-assistant"
       ]
     }
   ]

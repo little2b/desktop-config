@@ -76,7 +76,7 @@ input {
 cursor {
     // 光标主题：填写已安装主题的目录名，例如 "breeze_cursors" 或 "Adwaita"。
     // 主题位于 /usr/share/icons 或 ~/.local/share/icons，且包含 cursors 子目录。
-    xcursor-theme "breeze_cursors"
+    xcursor-theme "capitaine-cursors"
     // 光标大小（像素）：常用 24、32、48。
     xcursor-size 24
 
@@ -84,6 +84,11 @@ cursor {
     // hide-when-typing
     // 取消下一行注释可在静止 3 秒后隐藏光标（单位：毫秒）。
     // hide-after-inactive-ms 3000
+}
+
+// Work around cursor-plane artifacts on the AMD internal display.
+debug {
+    disable-cursor-plane
 }
 
 // You can configure outputs by their name, which you can find
@@ -123,13 +128,37 @@ cursor {
     position x=1280 y=0
 }
 
+// Keep focus rings and borders outside translucent window contents.
+window-rule {
+    draw-border-with-background false
+}
+
+// Keep Kitty readable while focused and more translucent while inactive.
+window-rule {
+    match app-id="^kitty$"
+    opacity 1.0
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+window-rule {
+    match app-id="^kitty$" is-focused=false
+    opacity 0.82
+    background-effect {
+        blur false
+        xray false
+    }
+}
+
 // Settings that influence how windows are positioned and sized.
 // Find more information on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Layout
 layout {
     background-color "transparent"
     // Set gaps around windows in logical pixels.
-    gaps 6
+    gaps 3
 
     // When to center a column when changing focus, options are:
     // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -359,6 +388,18 @@ window-rule {
     // - Flatpak Firefox (app-id is "org.mozilla.firefox")
     match app-id=r#"firefox$"# title="^Picture-in-Picture$"
     open-floating true
+}
+
+// Open the file manager as a floating window by default.
+window-rule {
+    match app-id="^org[.]gnome[.]Nautilus$"
+    open-floating true
+}
+
+// Give remote desktop sessions the full available width by default.
+window-rule {
+    match app-id="^org[.]remmina[.]Remmina$"
+    default-column-width { proportion 1.0; }
 }
 
 // Example: block out two password managers from screen capture.
@@ -618,11 +659,10 @@ binds {
     Mod+F { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
 
-    // While maximize-column leaves gaps and borders around the window,
-    // maximize-window-to-edges doesn't: the window expands to the edges of the screen.
-    // This bind corresponds to normal window maximizing,
-    // e.g. by double-clicking on the titlebar.
-    Mod+M { maximize-window-to-edges; }
+    // Keep the Win+M maximized layout inside the space reserved by Clavis.
+    // Native title-bar maximize requests still expand to the screen edges and
+    // trigger Clavis' automatic top-component hiding.
+    Mod+M { maximize-column; }
 
     // Expand the focused column to space not taken up by other fully visible columns.
     // Makes the column "fill the rest of the space".

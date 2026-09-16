@@ -82,15 +82,15 @@
     "mode": "light",
     "superKeyStyle": "text",
     "lockScreenStyle": "default",
-    "cursorTheme": "breeze_cursors",
+    "cursorTheme": "capitaine-cursors",
     "cursorSize": 24,
     "cursorHideWhenTyping": false,
     "cursorHideAfterInactiveMs": 0,
     "iconTheme": "",
     "fonts": {
       "ui": "LXGW WenKai GB Screen",
-      "mono": "JetBrainsMono Nerd Font",
-      "numeric": "JetBrainsMono Nerd Font",
+      "mono": "JetBrainsMono Nerd Font Mono",
+      "numeric": "JetBrainsMono Nerd Font Mono",
       "expressive": "Google Sans Flex"
     }
   },
@@ -104,7 +104,7 @@
     "position": "top",
     "capsLockOsd": true,
     "numLockOsd": true,
-    "hideDate": false,
+    "hideDate": true,
     "hoverAction": "peak",
     "leftClickAction": "dashboard",
     "middleClickAction": "lyrics",
@@ -116,13 +116,13 @@
       ]
     },
     "horizontalClock": {
-      "fontSize": 16,
+      "fontSize": 28,
       "axes": {
         "wght": 900,
         "wdth": 85,
-        "opsz": 18,
+        "opsz": 47,
         "GRAD": 0,
-        "ROND": 25,
+        "ROND": 23,
         "slnt": 0
       },
       "digits": {
