@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""Apply only the explicitly captured appearance and file-association settings."""
+import json
+from pathlib import Path
+import subprocess
+
+source = Path.home() / '.config/nyx-desktop-style/desktop-preferences.json'
+preferences = json.loads(source.read_text())
+for entry in preferences['gsettings']:
+    subprocess.run(['gsettings', 'set', entry['schema'], entry['key'], entry['value']], check=True)
+for mime, desktop in preferences['mime'].items():
+    if desktop:
+        subprocess.run(['xdg-mime', 'default', desktop, mime], check=True)
+theme = Path.home() / '.local/share/icons/Clavis-Reference'
+if (theme / 'index.theme').is_file():
+    subprocess.run(['gtk-update-icon-cache', '-f', str(theme)], check=True)
+print('Desktop appearance and default applications restored.')

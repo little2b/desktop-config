@@ -52,13 +52,15 @@ def capture(home, root=ROOT):
         content = path.read_text()
         if relative.startswith('bin/'):
             content = content.replace(str(home) + '/.config/nyx-desktop-style/dolphin.qss', '"$HOME/.config/nyx-desktop-style/dolphin.qss"')
+        if relative == 'bin/open-quark-drive':
+            content = content.replace(str(home) + '/.local/share/cloud-mounts/quark', '"$HOME/.local/share/cloud-mounts/quark"')
         content = content.replace(str(home) + '/.local/bin/qs', '/usr/bin/qs')
         content = content.replace(str(home), '@HOME@')
         content = content.replace('/usr/libexec/kf6/polkit-kde-authentication-agent-1', '/usr/lib/polkit-kde-authentication-agent-1')
         if path.suffix == '.desktop':
             content = re.sub(r'^Exec=(@HOME@/\.local/bin/[^\s"]+)(.*)$', r'Exec="\1"\2', content, flags=re.M)
             content = re.sub(r'^TryExec=@HOME@/\.local/bin/([^\s]+)$', r'TryExec=/usr/bin/\1', content, flags=re.M)
-        if path.suffix in ('.colors', '.colorscheme', '.profile'):
+        if path.suffix in ('.colors', '.colorscheme', '.profile', '.service'):
             content = content.rstrip('\n') + '\n'
         put(relative, content)
         (root / relative).chmod(path.stat().st_mode & 0o777)
@@ -97,9 +99,31 @@ def capture(home, root=ROOT):
             copy(path, 'config/quickshell/nyx-dock/' + path.name)
     copy(home / '.local/lib/nyx-dock/uninstall-app.py', 'lib/nyx-dock/uninstall-app.py')
     # Preserve Arch-specific adaptations of the theme bridge and user services.
-    for name in ['dolphin', 'konsole']:
+    for name in ['dolphin', 'konsole', 'key', 'open-quark-drive']:
         copy(home / '.local/bin' / name, 'bin/' + name)
+    for name in ['dolphin', 'konsole']:
         copy(home / '.local/share/applications' / ('org.kde.' + name + '.desktop'), 'share/applications/org.kde.' + name + '.desktop')
+    copy(home / '.local/share/applications/quark-drive.desktop', 'share/applications/quark-drive.desktop')
+    copy(home / '.config/systemd/user/rclone-quark.service', 'config/systemd/user/rclone-quark.service')
+    copy(home / '.local/lib/nyx-desktop-style/sync-theme.py', 'lib/nyx-desktop-style/sync-theme.py')
+    # The derived theme contains only SVG resources, not caches or account data.
+    icon_dir = home / '.local/share/icons/Clavis-Reference'
+    for path in sorted(icon_dir.rglob('*')):
+        if path.is_file() and (path.suffix == '.svg' or path.name == 'index.theme'):
+            copy(path, 'share/icons/Clavis-Reference/' + str(path.relative_to(icon_dir)))
+    if home == Path.home().resolve():
+        preferences = {'gsettings': [], 'mime': {}}
+        for schema, keys in {
+            'org.gnome.desktop.interface': ['icon-theme', 'accent-color', 'color-scheme'],
+            'org.gnome.nautilus.preferences': ['default-folder-viewer'],
+            'org.gnome.nautilus.icon-view': ['default-zoom-level'],
+        }.items():
+            for key in keys:
+                value = subprocess.check_output(['gsettings', 'get', schema, key], text=True).strip()
+                preferences['gsettings'].append({'schema': schema, 'key': key, 'value': value})
+        for mime in ['inode/directory', 'video/matroska']:
+            preferences['mime'][mime] = subprocess.check_output(['xdg-mime', 'query', 'default', mime], text=True).strip()
+        put('config/nyx-desktop-style/desktop-preferences.json', json.dumps(preferences, ensure_ascii=False, indent=2) + '\n')
     for name in ['dolphinrc', 'konsolerc', 'plasma-localerc']:
         copy(home / '.config' / name, 'config/' + name)
     for folder in ['alacritty', 'fuzzel', 'gtk-3.0', 'gtk-4.0', 'nyx-desktop-style', 'fcitx5']:
@@ -128,10 +152,8 @@ def capture(home, root=ROOT):
         saved['manual'] = dict(weather['manual'])
         with (root / 'config/Clavis/Weather.conf').open('w') as stream:
             saved.write(stream, space_around_delimiters=False)
-    # Plain Rime configuration can be read live; preserve the existing consistent userdb snapshot.
-    for pattern in ['*.yaml', '*.txt']:
-        for path in (home / '.local/share/fcitx5/rime').glob(pattern):
-            copy(path, 'rime/' + path.name)
+    # Keep the previous Rime snapshot. Do not publish newly learned words or
+    # personal phrases as a side effect of a desktop configuration backup.
     lock['desktop_snapshot'] = {'captured_at': datetime.now().astimezone().isoformat(timespec='seconds')}
     put('sources.lock.json', json.dumps(lock, ensure_ascii=False, indent=2) + '\n')
     print('Desktop, Dock, application helpers and hardware preferences captured. Existing Rime userdb snapshot preserved.')

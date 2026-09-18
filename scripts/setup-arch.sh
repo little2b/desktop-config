@@ -7,6 +7,7 @@ for argument in "$@"; do
 done
 python3 "$script_dir/restore.py" "$@"
 "$script_dir/install-arch-dependencies.sh"
+"$script_dir/install-key-cli.sh"
 python3 "$script_dir/restore.py" --apply "$@"
 "$script_dir/build-clavis.sh"
 "$script_dir/enable-services.sh"

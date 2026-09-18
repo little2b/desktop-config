@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=夸克网盘
+Comment=通过 OpenList 挂载夸克网盘并打开默认文件管理器
+Exec="@HOME@/.local/bin/open-quark-drive"
+Icon=folder-cloud
+Terminal=false
+Categories=Network;FileManager;
+Keywords=Quark;OpenList;WebDAV;网盘;

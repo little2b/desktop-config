@@ -25,8 +25,8 @@ p=Path(sys.argv[2]);p.mkdir(parents=True,exist_ok=True)
 with tarfile.open(sys.argv[1]) as archive: archive.extractall(p,filter='data')
 PY
 cmake -S "$source_dir" -B "$source_dir/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
-    -DCMAKE_INSTALL_PREFIX="$prefix_dir" -DCLAVIS_QML_INSTALL_DIR="$prefix_dir/lib/qml" \
-    -DCMAKE_INSTALL_RPATH="$prefix_dir/lib"
+    -DCMAKE_INSTALL_PREFIX="$prefix_dir" -DCLAVIS_QML_INSTALL_DIR="$prefix_dir/lib/qt6/qml" \
+    -DCMAKE_BUILD_RPATH_USE_ORIGIN=ON
 cmake --build "$source_dir/build" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-4}"
 if systemctl --user is-active --quiet clavis-shell.service; then
     echo 'Stop clavis-shell.service before installing its native plugins.' >&2

@@ -5,6 +5,8 @@
   "systemTemperatureUnit": "celsius",
   "spotlightSearchEngine": "google",
   "spotlightAppStyle": "list",
+  "spotlightAppOrder": "name",
+  "spotlightClipboardStyle": "default",
   "weatherMapBaseProvider": "openfreemap",
   "weatherMapOverlayProvider": "rainviewer",
   "systemMonitorGpuId": "",
@@ -90,7 +92,7 @@
       "time": {
         "enabled": true,
         "container": "desktop",
-        "screenName": "eDP-1",
+        "screenName": "DP-2",
         "sidebar": {
           "x": 0,
           "y": 336
@@ -98,8 +100,8 @@
         "desktop": {
           "placementSpace": "screen",
           "screen": {
-            "xNorm": 0.7447916666666666,
-            "yNorm": 0.09166666666666666
+            "xNorm": 0.058333333333333334,
+            "yNorm": 0.08888888888888889
           },
           "wallpaper": {
             "xNorm": 0.5,
@@ -298,8 +300,8 @@
         "desktop": {
           "placementSpace": "screen",
           "screen": {
-            "xNorm": 0.5,
-            "yNorm": 0.5
+            "xNorm": 0.7458333333333333,
+            "yNorm": 0.4444444444444444
           },
           "wallpaper": {
             "xNorm": 0.5,

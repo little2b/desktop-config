@@ -2,8 +2,14 @@
   "clavis": {
     "repository": "https://github.com/little2b/quickshell.git",
     "branch": "personal/fedora-niri",
-    "commit": "21f7601885454deb9fa76c262f4ac80aa99e9ea2",
-    "upstream_commit": "eb9e72480fb1b8d4b56af9cdc0a4fcd4fb244f5c"
+    "commit": "d8b871a480adb69bfba8891bf56ef945b407921b",
+    "upstream_repository": "https://github.com/StatIndet/quickshell.git",
+    "upstream_commit": "ac388acf9a4537cf1c69232aceb326af9478b71f"
+  },
+  "key_cli": {
+    "repository": "https://github.com/StatIndet/key-cli.git",
+    "commit": "3f58f9ace33bc542768bf78ada7a6e6c2e2bc3af",
+    "installation": "/usr/local/bin/key via upstream scripts/install.sh"
   },
   "arch_installer": {
     "repository": "StatIndet/quickshell",
@@ -24,6 +30,6 @@
     "niri_commit": "2f87f3846bf9e6e7e02db398bee1b42dc24b106f"
   },
   "desktop_snapshot": {
-    "captured_at": "2026-09-17T00:01:31+08:00"
+    "captured_at": "2026-09-18T19:39:29+08:00"
   }
 }

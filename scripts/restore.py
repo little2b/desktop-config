@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Restore this private desktop snapshot. Default mode only prints a plan."""
+"""Restore this portable desktop snapshot. Default mode only prints a plan."""
 import argparse
 import configparser
 import hashlib

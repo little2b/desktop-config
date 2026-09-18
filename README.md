@@ -1,6 +1,6 @@
 # 个人 Niri / Clavis 桌面迁移配置
 
-这个**私有仓库**保存独立 Dock、本机桌面设置及迁移资源。Clavis 应用源码在
+这个仓库保存独立 Dock、本机桌面设置及迁移资源。仓库当前为**公开**，新增快照不包含账号凭据或历史记录。Clavis 应用源码在
 [little2b/quickshell 的 personal/fedora-niri 分支](https://github.com/little2b/quickshell/tree/personal/fedora-niri)。
 两者配合恢复整套桌面。新增功能入口与当前启用状态见 [FEATURES.md](FEATURES.md)。`sources.lock.json` 固定了本快照对应的 Clavis 提交。
 
@@ -45,6 +45,7 @@ cd desktop-config
 python3 scripts/restore.py --same-hardware
 # 上一条只显示计划，不写入文件。
 ./scripts/install-arch-dependencies.sh
+./scripts/install-key-cli.sh
 python3 scripts/restore.py --apply --same-hardware
 ./scripts/build-clavis.sh
 ./scripts/enable-services.sh
@@ -65,7 +66,7 @@ python3 scripts/restore.py --apply --same-hardware
 |---|---|
 | 独立 Dock | 悬停保持显示、右键操作菜单、应用页面左键启动/右键菜单、拖拽分组、固定顺序及外观设置 |
 | 应用卸载 | Arch 的 pacman/AUR、Fedora 的 RPM 和 Flatpak 卸载确认；手动安装程序和网页应用显示处理提示 |
-| 文件管理器/终端 | Dolphin 中文入口、Alacritty/Konsole 配色、字体与留白，跟随 Clavis 主题 |
+| 文件管理器/终端 | 默认 Nautilus，浅色背景和紫灰色 Papirus 衍生图标；保留 Dolphin、Alacritty/Konsole 的主题同步 |
 | Niri | 快捷键、窗口规则、缩放与显示器布局、鼠标和光标配置 |
 | Clavis | 主题、侧栏、桌面卡片、时间卡片位置、输入偏好、电源设置、沙坪坝天气及网盘功能开关 |
 | 输入法 | Fcitx5 配置、雾凇拼音源码词库、自定义配置及一致性快照的用户词库 |
@@ -94,7 +95,7 @@ Microsoft Office/WPS 字体及其他软件的账号、数据和授权需要单�
 
 ## 后续修改和更新
 
-这是 2026-09-17 更新的快照，包含最大化时顶栏自动收起、保留浏览器标签栏、
+这是 2026-09-18 更新的快照，Clavis 已合入作者 `ac388ac`，包含四圆液态动画、文件搜索、换算工具和顶栏媒体控件。保留最大化时顶栏自动收起、浏览器标签栏、
 边缘唤出、通知短暂显示、圆角/阴影渲染与模糊残留修复，以及此前的侧栏、抽屉、
 滚动、通知布局和天气测试隔离。后续修改 Clavis 源码推送到 `quickshell` 的定制分支；修改本机 Dock 或桌面偏好后，在本仓库收集当前设置并提交：
 
@@ -111,8 +112,8 @@ git push
 不要将包含真实凭据的目录添加到本仓库。迁移前若当前桌面又有调整，需先刷新快照。
 
 `capture-current.py` 只收集明确的桌面设置、Dock 源码和卸载辅助程序；替换本机 Home 路径、
-移除 API 密钥/令牌字段，并清空网盘账号绑定。它不会停止输入法，也不会复制正在写入的
-Rime 用户数据库；仓库保留上次一致性快照的用户词库。Clavis 源码必须先提交，快照才会
+移除 API 密钥/令牌字段，并清空网盘账号绑定。它不会停止输入法，也不会新增当前
+Rime 个人短语或用户数据库；仓库已有的词库快照保持不变。Clavis 源码必须先提交，快照才会
 记录对应提交，避免新系统构建出不同的桌面。现有 Arch 专用服务和主题同步适配会保留。
 
 应用卸载在 Arch 上使用 `pacman -R` 并保留确认步骤，AUR 安装的包也由 pacman 管理。
@@ -122,6 +123,19 @@ Rime 用户数据库；仓库保留上次一致性快照的用户词库。Clavis
 
 当前 CachyOS 快照使用 `niri-git`，包含 PipeWire SHM 屏幕共享支持。依赖脚本会在
 配置的软件仓库提供该包时优先安装；普通 Arch 仓库没有该包时仍使用稳定版 Niri。
+
+## 本次应用外观与网盘设置
+
+- Nautilus 是默认文件管理器，GTK 4 样式位于 `config/gtk-4.0/reference-nautilus.css`。
+  紫灰色图标位于 `share/icons/Clavis-Reference`，还需安装 Papirus 作为继承主题。
+- `bin/apply-desktop-preferences` 恢复已收集的 GNOME 外观、图标视图和文件关联；
+  `enable-services.sh` 会调用它，不导入整份 dconf 数据库。
+- `rclone-quark.service` 和“夸克网盘”入口已保存，使用只读挂载和 5 GiB 磁盘缓存目标。
+  新系统仍需自行配置 OpenList 及 rclone 的 `quark-openlist` WebDAV 连接。Cookie、密码、
+  rclone 配置和缓存文件均不在快照内；挂载服务不会被恢复脚本自动启动。
+- 新版 Spotlight 的文件搜索及换算需要 `sources.lock.json` 固定的 key-cli 源码。
+  `install-key-cli.sh` 调用它自己的安装器部署到 `/usr/local`，优先通过图形密码框认证；
+  不改设备权限、不启动服务。`bin/key` 与原生模块路径和当前安装保持一致。
 
 ## 验证范围
 

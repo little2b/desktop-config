@@ -1,0 +1,30 @@
+/* Approximation of the supplied screenshot, scoped to Nautilus windows. */
+window.nautilus-window {
+  --window-bg-color: #f5faf8;
+  --window-fg-color: #303837;
+  --view-bg-color: #f5faf8;
+  --view-fg-color: #303837;
+  --headerbar-bg-color: #f5faf8;
+  --headerbar-fg-color: #303837;
+  --headerbar-backdrop-color: #f5faf8;
+  --sidebar-bg-color: #f0f5f2;
+  --sidebar-fg-color: #303837;
+  --sidebar-backdrop-color: #f0f5f2;
+  --secondary-sidebar-bg-color: #f5faf8;
+  --secondary-sidebar-fg-color: #303837;
+  --card-bg-color: #ffffff;
+  --card-fg-color: #303837;
+  --accent-bg-color: #8c6ab8;
+  --accent-fg-color: #ffffff;
+  --accent-color: #78549f;
+}
+
+window.nautilus-window .navigation-sidebar row:selected,
+window.nautilus-window .nautilus-grid-view gridview > child:selected {
+  background-color: #e1e8e4;
+  color: #303837;
+}
+
+window.nautilus-window .nautilus-grid-view gridview > child:hover:not(:selected) {
+  background-color: #edf2ef;
+}

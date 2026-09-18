@@ -97,7 +97,7 @@
   "effects": {
     "shellBackgroundOpacity": 0.49,
     "shellBlurEnabled": true,
-    "shellBlurXray": true
+    "shellBlurXray": false
   },
   "keystone": {
     "style": "pill",

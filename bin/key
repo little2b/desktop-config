@@ -1,5 +1,5 @@
 #!/bin/sh
-# Arch package supplies the backend; only the user's Clavis native plugins are local.
+# Use the source-installed backend required by the updated Clavis shell.
 export CLAVIS_DISABLE_CLOUD=0
-export QML_IMPORT_PATH="$HOME/.local/lib/clavis-runtime/lib/qml${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
-exec /usr/bin/key "$@"
+export QML_IMPORT_PATH="$HOME/.local/lib/clavis-runtime/lib/qt6/qml${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
+exec /usr/local/bin/key "$@"

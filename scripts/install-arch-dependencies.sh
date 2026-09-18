@@ -8,9 +8,9 @@ command -v python3 >/dev/null || { echo 'Install python first: sudo pacman -Syu 
 sudo pacman -Syu --needed git python curl github-cli rclone fcitx5 fcitx5-rime fcitx5-configtool \
     fcitx5-gtk fcitx5-qt librime xorg-xrdb xwayland-satellite \
     xdg-desktop-portal-gnome xdg-desktop-portal-gtk xdg-user-dirs \
-    polkit polkit-kde-agent flatpak breeze breeze-gtk plasma-integration dolphin konsole alacritty fuzzel \
+    polkit polkit-kde-agent flatpak breeze breeze-gtk plasma-integration dolphin nautilus papirus-icon-theme smplayer konsole alacritty fuzzel \
     noto-fonts noto-fonts-cjk noto-fonts-emoji fontconfig kconfig python-gobject \
-    wl-clipboard swaylock playerctl brightnessctl
+    wl-clipboard swaylock playerctl brightnessctl fd libqalculate
 # CachyOS and other configured repositories may provide a current niri-git
 # package. Install it before the upstream resolver so its `niri` provide is
 # used; plain Arch falls back to the stable niri package from the installer.

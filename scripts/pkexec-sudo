@@ -1,0 +1,6 @@
+#!/bin/sh
+# Only used in a temporary PATH by install-key-cli.sh.
+if [ "${1-}" = "-n" ]; then
+    shift
+fi
+exec /usr/bin/pkexec "$@"

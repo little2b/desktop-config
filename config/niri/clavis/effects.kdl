@@ -1,2 +1,9 @@
 // Managed by Clavis.
-// X-Ray is niri's default for client-requested effects.
+layer-rule {
+    match namespace="^clavis-shell-";
+    background-effect { xray false; };
+}
+window-rule {
+    match title="^(clavis-control-center(-[a-z-]+)?|clavis-file-picker)$";
+    background-effect { xray false; };
+}

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! curl --fail --silent --max-time 3 http://127.0.0.1:5244/api/public/settings >/dev/null; then
+    kdialog --error '请先打开 OpenList Desktop 并启动 OpenList 核心，再打开夸克网盘。'
+    exit 1
+fi
+
+if ! systemctl --user start rclone-quark.service; then
+    kdialog --error '夸克网盘挂载失败。请确认 OpenList 已启动、夸克存储正常，并检查 OpenList 登录凭据。'
+    exit 1
+fi
+
+exec xdg-open "$HOME/.local/share/cloud-mounts/quark"
