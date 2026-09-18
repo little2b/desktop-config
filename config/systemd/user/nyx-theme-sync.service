@@ -1,5 +1,5 @@
 [Unit]
-Description=Follow Clavis colors in Dolphin and terminals
+Description=Follow Clavis colors in file manager, terminals and Fcitx5
 
 [Service]
 Type=oneshot

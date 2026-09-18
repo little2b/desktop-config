@@ -4,7 +4,7 @@ Description=Quark drive through local OpenList WebDAV
 [Service]
 Type=notify
 ExecStartPre=/usr/bin/mkdir -p %h/.local/share/cloud-mounts/quark
-ExecStart=/usr/bin/rclone mount quark-openlist:夸克 %h/.local/share/cloud-mounts/quark --config=%h/.config/rclone/rclone.conf --read-only --vfs-cache-mode=full --cache-dir=%h/.cache/rclone-openlist --vfs-cache-max-size=5G --vfs-cache-max-age=24h --vfs-read-ahead=128M --buffer-size=16M --dir-cache-time=5m --poll-interval=0 --contimeout=10s --timeout=1m --umask=077
+ExecStart=/usr/bin/rclone mount quark-openlist: %h/.local/share/cloud-mounts/quark --config=%h/.config/rclone/rclone.conf --vfs-cache-mode=full --cache-dir=%h/.cache/rclone-openlist --vfs-cache-max-size=5G --vfs-cache-max-age=24h --vfs-read-ahead=128M --buffer-size=16M --dir-cache-time=5m --poll-interval=0 --contimeout=10s --timeout=1m --umask=077
 ExecStop=/usr/bin/fusermount3 -u %h/.local/share/cloud-mounts/quark
 TimeoutStartSec=30
 TimeoutStopSec=20

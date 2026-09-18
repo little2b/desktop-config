@@ -95,9 +95,9 @@ Microsoft Office/WPS 字体及其他软件的账号、数据和授权需要单�
 
 ## 后续修改和更新
 
-这是 2026-09-18 更新的快照，Clavis 已合入作者 `ac388ac`，包含四圆液态动画、文件搜索、换算工具和顶栏媒体控件。保留最大化时顶栏自动收起、浏览器标签栏、
+这是 2026-09-19 更新的快照，Clavis 固定到个人提交 `1adb5d1`，已合入作者 `ac388ac`，包含四圆液态动画、文件搜索、换算工具和顶栏媒体控件。保留最大化时顶栏自动收起、浏览器标签栏、
 边缘唤出、通知短暂显示、圆角/阴影渲染与模糊残留修复，以及此前的侧栏、抽屉、
-滚动、通知布局和天气测试隔离。后续修改 Clavis 源码推送到 `quickshell` 的定制分支；修改本机 Dock 或桌面偏好后，在本仓库收集当前设置并提交：
+滚动、通知布局和天气测试隔离。当前版本还包含显示器开关、模糊区域去重、歌词频谱按需刷新、封面加载优化、顶栏循环绑定和 QQ 激活修复。后续修改 Clavis 源码推送到 `quickshell` 的定制分支；修改本机 Dock 或桌面偏好后，在本仓库收集当前设置并提交：
 
 ```bash
 python3 scripts/capture-current.py --apply
@@ -126,16 +126,22 @@ Rime 个人短语或用户数据库；仓库已有的词库快照保持不变。
 
 ## 本次应用外观与网盘设置
 
+- Fcitx5 使用 `ClavisWallpaper` 主题。现有 `nyx-theme-sync.path` 监听 Clavis 调色板变化，
+  同步候选框和菜单颜色，并通过 D-Bus 重载 `classicui`，不重启输入法。
+  `UseAccentColor=False` 避免系统强调色覆盖壁纸颜色；横排、字体和输入方案保持个人设置。
 - Nautilus 是默认文件管理器，GTK 4 样式位于 `config/gtk-4.0/reference-nautilus.css`。
   紫灰色图标位于 `share/icons/Clavis-Reference`，还需安装 Papirus 作为继承主题。
 - `bin/apply-desktop-preferences` 恢复已收集的 GNOME 外观、图标视图和文件关联；
   `enable-services.sh` 会调用它，不导入整份 dconf 数据库。
-- `rclone-quark.service` 和“夸克网盘”入口已保存，使用只读挂载和 5 GiB 磁盘缓存目标。
+- `rclone-quark.service` 和“夸克网盘”入口已保存，保留当前挂载参数和 5 GiB 磁盘缓存目标。
   新系统仍需自行配置 OpenList 及 rclone 的 `quark-openlist` WebDAV 连接。Cookie、密码、
   rclone 配置和缓存文件均不在快照内；挂载服务不会被恢复脚本自动启动。
 - 新版 Spotlight 的文件搜索及换算需要 `sources.lock.json` 固定的 key-cli 源码。
   `install-key-cli.sh` 调用它自己的安装器部署到 `/usr/local`，优先通过图形密码框认证；
   不改设备权限、不启动服务。`bin/key` 与原生模块路径和当前安装保持一致。
+- Manggo 翻译与 QQ 原生截图的 Niri 快捷键、辅助脚本及 Manggo portal 注册已收集。
+  辅助脚本恢复至 `~/.local/libexec/`；需另行安装 QQ、Manggo 及 PyGObject/GTK 3、libXtst、wl-clipboard 等运行依赖。
+  快照不包含本机编译的 HiDPI XWayland 二进制，相关兼容运行时仍需单独重建。
 
 ## 验证范围
 

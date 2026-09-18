@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def verify(root=ROOT):
     manifest = json.loads((root / 'manifest.json').read_text())
-    actual = {str(p.relative_to(root)) for directory in ['config', 'share', 'lib', 'bin', 'rime', 'assets', 'hardware', 'system-reference']
+    actual = {str(p.relative_to(root)) for directory in ['config', 'share', 'lib', 'libexec', 'bin', 'rime', 'assets', 'hardware', 'system-reference']
               for p in (root / directory).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc'}
     actual.add('sources.lock.json')
     if actual != set(manifest['sha256']):
@@ -34,7 +34,7 @@ def verify(root=ROOT):
 def plan(target_home, same_hardware=False, root=ROOT):
     result = {}
     for source_dir, target_dir in [('config', '.config'), ('share', '.local/share'),
-                                   ('lib', '.local/lib'), ('bin', '.local/bin'),
+                                   ('lib', '.local/lib'), ('libexec', '.local/libexec'), ('bin', '.local/bin'),
                                    ('rime', '.local/share/fcitx5/rime')]:
         for path in sorted((root / source_dir).rglob('*')):
             if not path.is_file() or '__pycache__' in path.parts or path.suffix == '.pyc':

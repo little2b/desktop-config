@@ -1,0 +1,7 @@
+// Manggo actions forwarded through the local GlobalShortcuts portal backend.
+binds {
+    Alt+D repeat=false hotkey-overlay-title="Manggo：划词翻译" { spawn "@HOME@/.local/libexec/manggo-shortcuts.py" "--trigger" "selection-translation"; }
+    Alt+G repeat=false hotkey-overlay-title="Manggo：输入翻译" { spawn "@HOME@/.local/libexec/manggo-shortcuts.py" "--trigger" "input-translation"; }
+    Alt+X repeat=false hotkey-overlay-title="Manggo：截图识别" { spawn "@HOME@/.local/libexec/manggo-shortcuts.py" "--trigger" "screenshot-recognition"; }
+    Alt+T repeat=false hotkey-overlay-title="Manggo：截图翻译" { spawn "@HOME@/.local/libexec/manggo-shortcuts.py" "--trigger" "screenshot-translation"; }
+}

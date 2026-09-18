@@ -1,8 +1,14 @@
 // Display settings migrated from config.kdl without changing values.
 output "eDP-1" {
-    mode "3072x1920@120.002";
-    scale 2;
-    transform "normal";
+
+
+
+
+off;
+mode "3072x1920@120.002";
+scale 2;
+transform "normal";
+position x=1920 y=0;
 };
 output "DP-2" {
     mode "3840x2160@143.998";

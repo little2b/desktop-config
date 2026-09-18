@@ -8,7 +8,9 @@
     "tailscale",
     "tray-icon tray app main-tray",
     "remmina-icon",
-    "qing"
+    "qing",
+    "Manggo",
+    "1"
   ],
   "filterPassive": true
 }

@@ -99,7 +99,7 @@ DecorationHover=28,101,134
 [General]
 Name=Clavis Theme
 Name[zh_CN]=跟随桌面主题
-ColorScheme=NyxTheme
+ColorScheme=NyxTheme-8c3ea6bee7a7
 
 [ColorEffects:Inactive]
 Enable=false

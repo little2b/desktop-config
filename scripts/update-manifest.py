@@ -4,7 +4,7 @@ import hashlib
 import json
 root = Path(__file__).resolve().parents[1]
 paths = []
-for directory in ['config', 'share', 'lib', 'bin', 'rime', 'assets', 'hardware', 'system-reference']:
+for directory in ['config', 'share', 'lib', 'libexec', 'bin', 'rime', 'assets', 'hardware', 'system-reference']:
     paths.extend(p for p in (root / directory).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc')
 paths.append(root / 'sources.lock.json')
 result = {}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Manggo global shortcuts bridge for Niri
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.impl.portal.desktop.manggo
+ExecStart=/usr/bin/python "@HOME@/.local/libexec/manggo-shortcuts.py"
+Restart=on-failure
+RestartSec=2

@@ -1,8 +1,8 @@
 /* Generated from Clavis; includes the file-view palette bridge. */
-QWidget { color: #1d1c14; selection-color: #1e1c00; selection-background-color: #ebe68d; }
-QMainWindow, QDialog, QToolBar, QDockWidget, QMenuBar { background-color: #f2eee0; }
-DolphinView, DolphinView QGraphicsView, DolphinView QGraphicsView QWidget { color: #1d1c14; background-color: #fef9eb; }
-QAbstractItemView { background-color: #fef9eb; alternate-background-color: #f8f3e6; }
-QMenu, QToolTip { background-color: #ece8db; color: #1d1c14; border: 1px solid #cac7b5; }
-QMenu::item:selected, QToolButton:hover { background-color: #ebe68d; color: #1e1c00; }
-QLineEdit { color: #1d1c14; background-color: #fef9eb; selection-background-color: #ebe68d; selection-color: #1e1c00; }
+QWidget { color: #181c1f; selection-color: #001e2c; selection-background-color: #c4e7ff; }
+QMainWindow, QDialog, QToolBar, QDockWidget, QMenuBar { background-color: #eaeef3; }
+DolphinView, DolphinView QGraphicsView, DolphinView QGraphicsView QWidget { color: #181c1f; background-color: #f6fafe; }
+QAbstractItemView { background-color: #f6fafe; alternate-background-color: #f0f4f8; }
+QMenu, QToolTip { background-color: #e5e8ed; color: #181c1f; border: 1px solid #c0c7cd; }
+QMenu::item:selected, QToolButton:hover { background-color: #c4e7ff; color: #001e2c; }
+QLineEdit { color: #181c1f; background-color: #f6fafe; selection-background-color: #c4e7ff; selection-color: #001e2c; }

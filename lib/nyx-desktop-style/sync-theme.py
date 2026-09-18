@@ -71,6 +71,45 @@ def apply_kde_palette(scheme, target):
     atomic(target, ini({section: dict(existing[section]) for section in existing.sections()}))
 
 
+def render_fcitx(palette, base):
+    """Use the active Clavis palette rather than the desktop accent override."""
+    p = palette
+    theme_dir = base / '.local/share/fcitx5/themes/ClavisWallpaper'
+    margin = {'Left': '5', 'Right': '5', 'Top': '5', 'Bottom': '5'}
+    border = {'Color': p['surface_container_high'], 'BorderColor': p['primary'], 'BorderWidth': '1'}
+    sections = {
+        'Metadata': {'Name': 'Clavis Wallpaper', 'Name[zh_CN]': '跟随 Clavis 壁纸',
+                     'Name[zh_TW]': '跟隨 Clavis 桌布', 'Version': '1',
+                     'Description': 'Generated from the active Clavis wallpaper palette', 'ScaleWithDPI': 'True'},
+        'InputPanel': {'NormalColor': p['on_surface'], 'HighlightColor': p['on_primary_container'],
+                       'HighlightCandidateColor': p['on_primary_container'],
+                       'HighlightBackgroundColor': p['primary_container'],
+                       'PageButtonAlignment': 'Last Candidate'},
+        'InputPanel/TextMargin': margin,
+        'InputPanel/ContentMargin': {'Left': '2', 'Right': '2', 'Top': '2', 'Bottom': '2'},
+        'InputPanel/Background': border,
+        'InputPanel/Background/Margin': {'Left': '1', 'Right': '1', 'Top': '1', 'Bottom': '1'},
+        'InputPanel/Highlight': {'Color': p['primary_container']},
+        'InputPanel/Highlight/Margin': margin,
+        'InputPanel/PrevPage': {'Image': 'prev.svg'},
+        'InputPanel/NextPage': {'Image': 'next.svg'},
+        'Menu': {'NormalColor': p['on_surface'], 'HighlightCandidateColor': p['on_primary_container']},
+        'Menu/Background': border,
+        'Menu/Background/Margin': {'Left': '1', 'Right': '1', 'Top': '1', 'Bottom': '1'},
+        'Menu/ContentMargin': {'Left': '2', 'Right': '2', 'Top': '2', 'Bottom': '2'},
+        'Menu/TextMargin': margin,
+        'Menu/Highlight': {'Color': p['primary_container']},
+        'Menu/Highlight/Margin': margin,
+        'Menu/Separator': {'Color': p['outline_variant']},
+        'Menu/CheckBox': {'Image': 'radio.svg'},
+        'Menu/SubMenu': {'Image': 'next.svg'},
+    }
+    atomic(theme_dir / 'theme.conf', ini(sections))
+    for name, points in [('prev', '7,1 1,6 7,11'), ('next', '1,1 7,6 1,11')]:
+        atomic(theme_dir / f'{name}.svg', f'<svg xmlns="http://www.w3.org/2000/svg" width="8" height="12"><polygon points="{points}" fill="{p["on_surface_variant"]}"/></svg>\n')
+    atomic(theme_dir / 'radio.svg', f'<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><circle cx="6" cy="6" r="3" fill="{p["primary"]}"/></svg>\n')
+
+
 def render(palette, base):
     required = ['surface', 'surface_container', 'surface_container_high', 'surface_container_low',
                 'on_surface', 'on_surface_variant', 'primary', 'primary_container', 'on_primary_container',
@@ -141,6 +180,7 @@ QMenu::item:selected, QToolButton:hover {{ background-color: {p['primary_contain
 QLineEdit {{ color: {fg}; background-color: {bg}; selection-background-color: {p['primary_container']}; selection-color: {p['on_primary_container']}; }}
 '''
     atomic(base / '.config/nyx-desktop-style/dolphin.qss', qss)
+    render_fcitx(p, base)
     return profile, qss
 
 def refresh_live(profile, qss):
@@ -150,6 +190,12 @@ def refresh_live(profile, qss):
         params = GLib.Variant(sig, args) if sig else None
         return bus.call_sync(dest, path, interface, method, params, None, Gio.DBusCallFlags.NONE, 1200, None).unpack()
     names = call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'ListNames')[0]
+    if 'org.fcitx.Fcitx5' in names:
+        try:
+            call('org.fcitx.Fcitx5', '/controller', 'org.fcitx.Fcitx.Controller1',
+                 'ReloadAddonConfig', '(s)', ('classicui',))
+        except GLib.Error as error:
+            print('Fcitx theme reload failed:', error)
     def tree(dest, path):
         return ET.fromstring(call(dest, path, 'org.freedesktop.DBus.Introspectable', 'Introspect')[0])
     def children(dest, path):

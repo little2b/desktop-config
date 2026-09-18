@@ -56,6 +56,10 @@ def capture(home, root=ROOT):
             content = content.replace(str(home) + '/.local/share/cloud-mounts/quark', '"$HOME/.local/share/cloud-mounts/quark"')
         content = content.replace(str(home) + '/.local/bin/qs', '/usr/bin/qs')
         content = content.replace(str(home), '@HOME@')
+        if path.suffix == '.kdl':
+            content = '\n'.join(line.rstrip() for line in content.splitlines()) + '\n'
+        if path.suffix == '.service':
+            content = re.sub(r'(?<!["\w])(@HOME@/\.local/libexec/[^\s"]+)', r'"\1"', content)
         content = content.replace('/usr/libexec/kf6/polkit-kde-authentication-agent-1', '/usr/lib/polkit-kde-authentication-agent-1')
         if path.suffix == '.desktop':
             content = re.sub(r'^Exec=(@HOME@/\.local/bin/[^\s"]+)(.*)$', r'Exec="\1"\2', content, flags=re.M)
@@ -91,8 +95,18 @@ def capture(home, root=ROOT):
 
     copy(home / '.config/clavis/primary-display.json', 'hardware/primary-display.json')
     copy(home / '.config/niri/clavis/outputs.kdl', 'hardware/outputs.kdl')
-    for relative in ['config.kdl', 'clavis/mouse.kdl', 'clavis/cursor.kdl', 'clavis/layer-rules.kdl', 'clavis/effects.kdl']:
+    for relative in ['config.kdl', 'clavis/mouse.kdl', 'clavis/cursor.kdl', 'clavis/layer-rules.kdl',
+                     'clavis/effects.kdl', 'manggo-shortcuts.kdl', 'qq-screenshot.kdl']:
         copy(home / '.config/niri' / relative, 'config/niri/' + relative)
+    for name in ['manggo-shortcuts.py', 'qq-native-screenshot.py']:
+        copy(home / '.local/libexec' / name, 'libexec/' + name)
+    for relative in ['.config/systemd/user/manggo-shortcuts.service',
+                     '.config/xdg-desktop-portal/portals.conf',
+                     '.config/xdg-desktop-portal/niri-portals.conf',
+                     '.local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.manggo.service',
+                     '.local/share/xdg-desktop-portal/portals/manggo-shortcuts.portal']:
+        destination = relative.replace('.local/share/', 'share/', 1) if relative.startswith('.local/share/') else relative.removeprefix('.')
+        copy(home / relative, destination)
     dock = home / '.config/quickshell/nyx-dock'
     for path in sorted(dock.iterdir()):
         if path.suffix in ('.qml', '.js', '.json', '.svg'):
@@ -106,6 +120,10 @@ def capture(home, root=ROOT):
     copy(home / '.local/share/applications/quark-drive.desktop', 'share/applications/quark-drive.desktop')
     copy(home / '.config/systemd/user/rclone-quark.service', 'config/systemd/user/rclone-quark.service')
     copy(home / '.local/lib/nyx-desktop-style/sync-theme.py', 'lib/nyx-desktop-style/sync-theme.py')
+    input_theme = home / '.local/share/fcitx5/themes/ClavisWallpaper'
+    for path in sorted(input_theme.glob('*')):
+        if path.is_file() and path.suffix in ('.conf', '.svg'):
+            copy(path, 'share/fcitx5/themes/ClavisWallpaper/' + path.name)
     # The derived theme contains only SVG resources, not caches or account data.
     icon_dir = home / '.local/share/icons/Clavis-Reference'
     for path in sorted(icon_dir.rglob('*')):

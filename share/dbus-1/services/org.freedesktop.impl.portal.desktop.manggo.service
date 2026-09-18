@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.freedesktop.impl.portal.desktop.manggo
+Exec=/usr/bin/python "@HOME@/.local/libexec/manggo-shortcuts.py"
+SystemdService=manggo-shortcuts.service

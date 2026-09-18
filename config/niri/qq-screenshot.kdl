@@ -1,0 +1,19 @@
+// Receive QQ's native accelerator globally, including native Wayland clients.
+binds {
+    Ctrl+Alt+A repeat=false hotkey-overlay-title="QQ：跨工作区截图" {
+        spawn "@HOME@/.local/libexec/qq-native-screenshot.py";
+    }
+}
+
+// QQ's native capture overlay has an empty title (X11 window type DOCK).
+// Keep its frozen desktop image at screen size instead of tiling it.
+window-rule {
+    match app-id="^QQ$" title="^$"
+    open-floating true
+    open-fullscreen true
+    open-focused true
+    border { off; }
+    focus-ring { off; }
+    shadow { off; }
+    geometry-corner-radius 0
+}

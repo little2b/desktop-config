@@ -2,6 +2,7 @@
 config/** -text
 share/** -text
 lib/** -text
+libexec/** -text
 bin/** -text
 rime/** -text
 assets/** -text

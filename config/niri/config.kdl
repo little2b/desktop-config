@@ -769,3 +769,7 @@ include "clavis/cursor.kdl";
 include "clavis/layer-rules.kdl";
 
 include "clavis/effects.kdl";
+
+include "manggo-shortcuts.kdl";
+
+include "qq-screenshot.kdl";
