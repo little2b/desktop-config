@@ -106,7 +106,7 @@
     "lib/nyx-desktop-style/sync-theme.py": "db14fdb054de1249b43307aa6f8cb096a64367fbe797299df42e8b94db330adc",
     "lib/nyx-dock/uninstall-app.py": "024ee3938344e2bc5da67487abc518efc14a6436bed34fdddada539ddc1c4ca6",
     "libexec/manggo-shortcuts.py": "b73132d924c2f149e07e11763e4194981f77ea37a3f1687ef179ee881748cf2d",
-    "libexec/qq-native-screenshot.py": "7e1b4d80e926daf125d5b03d90132a41cbf3650c0a39ca6db74cc41188ab9207",
+    "libexec/qq-native-screenshot.py": "a2f9670919e0f8e04a64302745ce707ad14c35abf30663582fff84ef25bfa4ac",
     "rime/LICENSE.rime-ice": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
     "rime/cn_dicts/41448.dict.yaml": "39102601365554433396fa64947010f5a15e7a2c27d22f6cce4d80775919e7bc",
     "rime/cn_dicts/8105.dict.yaml": "1f9a42b91dea6982baee2551981780271aeffd78876662b9c9f324e56b37b120",
@@ -731,7 +731,7 @@
     "share/konsole/NyxTheme-8c3ea6bee7a7.colorscheme": "8d6ba37621bae5a60bce3eea3a6f782c1557e8737cb772a15fb1dd29848dc9aa",
     "share/konsole/NyxTheme-8c3ea6bee7a7.profile": "6794be01fca840a6c5154e7a3429f865258389abbfd9bccebb8d716fefee9b20",
     "share/xdg-desktop-portal/portals/manggo-shortcuts.portal": "03b4df021e25b6495a2fd76b42c10deb1c4c54d009f863bee4562015a0b13ce7",
-    "sources.lock.json": "73ea481865d92d83c6c78aabab38644d63625f0936488dabfa8d37f89906c2bc",
+    "sources.lock.json": "cfd59199e71ac4067b3efd57d8d55f88e7bfc49a256966f009b60b3c334ccb3a",
     "system-reference/hibernate-delay.conf": "36d14b8710ee2584b1c2e34252ad867722b4c9304e48dc5495231b7dbfa07806",
     "system-reference/logind-lid.conf": "757f977dce9eb8945e4201487f9ec18fc3b3fa5e4b7d576f539d141d061e3f95"
   }

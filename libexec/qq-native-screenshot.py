@@ -12,6 +12,7 @@ from pathlib import Path
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 
 
@@ -207,8 +208,17 @@ class ClipboardBridge:
 
     @staticmethod
     def publish(data):
-        subprocess.run(['/usr/bin/wl-copy', '--type', 'image/png'], input=data,
-            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=True, timeout=5)
+        # wl-copy forks a clipboard owner which can inherit stderr. A PIPE
+        # makes communicate() wait for that owner's EOF even after the parent
+        # has successfully published the image and exited.
+        with tempfile.TemporaryFile() as errors:
+            try:
+                subprocess.run(['/usr/bin/wl-copy', '--type', 'image/png'], input=data,
+                    stdout=subprocess.DEVNULL, stderr=errors, check=True, timeout=5)
+            except subprocess.CalledProcessError as error:
+                errors.seek(0)
+                error.stderr = errors.read()
+                raise
 
     def close(self):
         self.armed = False
