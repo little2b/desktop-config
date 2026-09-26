@@ -21,7 +21,8 @@ def clean_settings(value, home):
     if isinstance(value, dict):
         result = {}
         for key, item in value.items():
-            if re.search(r'password|secret|token|credential|api.?key', key, re.I) and isinstance(item, (str, list, dict)):
+            sensitive = re.search(r'password|secret|token|credential|api.?key|^(cookies?|authorization)$|(?:session|auth)cookie', key, re.I)
+            if sensitive and isinstance(item, (str, list, dict)):
                 result[key] = type(item)()
             else:
                 result[key] = clean_settings(item, home)
@@ -32,8 +33,8 @@ def clean_settings(value, home):
 def capture(home, root=ROOT):
     home = home.expanduser().resolve()
     source = home / '.config/quickshell/clavis'
-    if not (home / '.config/quickshell/nyx-dock/shell.qml').is_file():
-        raise RuntimeError('The selected home has no nyx-dock installation')
+    if not (source / 'Modules/Dock/DockHost.qml').is_file():
+        raise RuntimeError('The selected home has no Clavis native Dock installation')
     lock = json.loads((root / 'sources.lock.json').read_text())
     if (source / '.git').exists():
         dirty = subprocess.check_output(['git', '-C', str(source), 'status', '--porcelain'], text=True)
@@ -58,6 +59,8 @@ def capture(home, root=ROOT):
         content = content.replace(str(home), '@HOME@')
         if path.suffix == '.kdl':
             content = '\n'.join(line.rstrip() for line in content.splitlines()) + '\n'
+        if (relative.startswith('config/gtk-') and path.suffix == '.svg') or relative.startswith('config/fontconfig/'):
+            content = '\n'.join(line.rstrip() for line in content.splitlines()) + '\n'
         if path.suffix == '.service':
             content = re.sub(r'(?<!["\w])(@HOME@/\.local/libexec/[^\s"]+)', r'"\1"', content)
         content = content.replace('/usr/libexec/kf6/polkit-kde-authentication-agent-1', '/usr/lib/polkit-kde-authentication-agent-1')
@@ -69,7 +72,8 @@ def capture(home, root=ROOT):
         put(relative, content)
         (root / relative).chmod(path.stat().st_mode & 0o777)
 
-    for name in ['config.json', 'ui-preferences.json', 'quick-toggles.json', 'idle-policy.json', 'tray.json']:
+    for name in ['config.json', 'ui-preferences.json', 'quick-toggles.json', 'idle-policy.json', 'tray.json',
+                 'dock.json', 'launchpad.json']:
         path = home / '.config/clavis' / name
         if not path.is_file():
             continue
@@ -96,8 +100,13 @@ def capture(home, root=ROOT):
     copy(home / '.config/clavis/primary-display.json', 'hardware/primary-display.json')
     copy(home / '.config/niri/clavis/outputs.kdl', 'hardware/outputs.kdl')
     for relative in ['config.kdl', 'clavis/mouse.kdl', 'clavis/cursor.kdl', 'clavis/layer-rules.kdl',
-                     'clavis/effects.kdl', 'manggo-shortcuts.kdl', 'qq-screenshot.kdl']:
+                     'clavis/effects.kdl', 'clavis/minimize-animation.kdl',
+                     'manggo-shortcuts.kdl', 'qq-screenshot.kdl']:
         copy(home / '.config/niri' / relative, 'config/niri/' + relative)
+    # Kitty is installed by the package manager, not the source user's symlink.
+    niri_config = root / 'config/niri/config.kdl'
+    if niri_config.is_file():
+        niri_config.write_text(niri_config.read_text().replace('"@HOME@/.local/bin/kitty"', '"kitty"'))
     for name in ['manggo-shortcuts.py', 'qq-native-screenshot.py']:
         copy(home / '.local/libexec' / name, 'libexec/' + name)
     for relative in ['.config/systemd/user/manggo-shortcuts.service',
@@ -107,11 +116,11 @@ def capture(home, root=ROOT):
                      '.local/share/xdg-desktop-portal/portals/manggo-shortcuts.portal']:
         destination = relative.replace('.local/share/', 'share/', 1) if relative.startswith('.local/share/') else relative.removeprefix('.')
         copy(home / relative, destination)
-    dock = home / '.config/quickshell/nyx-dock'
-    for path in sorted(dock.iterdir()):
-        if path.suffix in ('.qml', '.js', '.json', '.svg'):
-            copy(path, 'config/quickshell/nyx-dock/' + path.name)
-    copy(home / '.local/lib/nyx-dock/uninstall-app.py', 'lib/nyx-dock/uninstall-app.py')
+    # The retired standalone Dock must not be restored alongside the native one.
+    for relative in ['config/quickshell/nyx-dock', 'lib/nyx-dock']:
+        if (root / relative).is_dir():
+            shutil.rmtree(root / relative)
+    (root / 'config/systemd/user/nyx-dock.service').unlink(missing_ok=True)
     # Preserve Arch-specific adaptations of the theme bridge and user services.
     for name in ['dolphin', 'konsole', 'key', 'open-quark-drive']:
         copy(home / '.local/bin' / name, 'bin/' + name)
@@ -142,9 +151,9 @@ def capture(home, root=ROOT):
         for mime in ['inode/directory', 'video/matroska']:
             preferences['mime'][mime] = subprocess.check_output(['xdg-mime', 'query', 'default', mime], text=True).strip()
         put('config/nyx-desktop-style/desktop-preferences.json', json.dumps(preferences, ensure_ascii=False, indent=2) + '\n')
-    for name in ['dolphinrc', 'konsolerc', 'plasma-localerc']:
+    for name in ['dolphinrc', 'konsolerc', 'plasma-localerc', 'kded5rc']:
         copy(home / '.config' / name, 'config/' + name)
-    for folder in ['alacritty', 'fuzzel', 'gtk-3.0', 'gtk-4.0', 'nyx-desktop-style', 'fcitx5']:
+    for folder in ['alacritty', 'kitty', 'fontconfig', 'fuzzel', 'gtk-3.0', 'gtk-4.0', 'nyx-desktop-style', 'fcitx5']:
         source_dir = home / '.config' / folder
         for path in sorted(source_dir.rglob('*')):
             if path.is_file() and not any(part.startswith('.') for part in path.relative_to(source_dir).parts) and not re.search(r'\.bak|backup|\.log$|\.lock$', path.name, re.I):
@@ -172,9 +181,10 @@ def capture(home, root=ROOT):
             saved.write(stream, space_around_delimiters=False)
     # Keep the previous Rime snapshot. Do not publish newly learned words or
     # personal phrases as a side effect of a desktop configuration backup.
-    lock['desktop_snapshot'] = {'captured_at': datetime.now().astimezone().isoformat(timespec='seconds')}
+    lock['desktop_snapshot'] = {'captured_at': datetime.now().astimezone().isoformat(timespec='seconds'),
+                                'dock': 'clavis-native'}
     put('sources.lock.json', json.dumps(lock, ensure_ascii=False, indent=2) + '\n')
-    print('Desktop, Dock, application helpers and hardware preferences captured. Existing Rime userdb snapshot preserved.')
+    print('Native Dock, Launchpad groups, desktop themes and hardware preferences captured. Existing Rime snapshot preserved.')
 
 
 def main():

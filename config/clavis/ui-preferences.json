@@ -100,8 +100,8 @@
         "desktop": {
           "placementSpace": "screen",
           "screen": {
-            "xNorm": 0.058333333333333334,
-            "yNorm": 0.08888888888888889
+            "xNorm": 0.057291666666666664,
+            "yNorm": 0.09166666666666666
           },
           "wallpaper": {
             "xNorm": 0.5,

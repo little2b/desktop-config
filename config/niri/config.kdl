@@ -365,10 +365,18 @@ window-rule {
     default-column-width {}
 }
 
-// WPS components should open as full-width columns on HiDPI displays.
+// WPS main windows should open as full-width columns on HiDPI displays.
 window-rule {
-    match app-id=r#"^(wps|et|wpp|wpspdf)$"#
+    match app-id=r#"^(wpsoffice|et|wpp|wpspdf)$"#
     default-column-width { proportion 1.0; }
+}
+
+// WPS exposes hover popups as short-lived XWayland toplevels. Keep those
+// popups out of the scrolling layout so they do not resize the main window.
+window-rule {
+    match app-id="^wps$" title="^wps$"
+    open-floating true
+    open-focused false
 }
 
 // Float titled auxiliary windows from WeChat and QQ.
@@ -460,8 +468,8 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+T hotkey-overlay-title="打开 Kitty 终端" { spawn "@HOME@/.local/bin/kitty"; }
-    Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
+    Mod+T hotkey-overlay-title="打开 Kitty 终端" { spawn "kitty"; }
+    Mod+D hotkey-overlay-title="进入空工作区" { focus-workspace 255; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
@@ -773,3 +781,5 @@ include "clavis/effects.kdl";
 include "manggo-shortcuts.kdl";
 
 include "qq-screenshot.kdl";
+
+include "clavis/minimize-animation.kdl";

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Only used in a temporary PATH by install-key-cli.sh.
+# Used only in the installers' temporary PATH and removed when they exit.
 if [ "${1-}" = "-n" ]; then
     shift
 fi

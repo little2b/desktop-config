@@ -3,14 +3,27 @@ set -euo pipefail
 repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 [[ -f /etc/arch-release ]] || { echo 'This installer is for Arch Linux only.' >&2; exit 1; }
 [[ $(id -u) -ne 0 ]] || { echo 'Run as your desktop user, not root.' >&2; exit 1; }
-command -v python3 >/dev/null || { echo 'Install python first: sudo pacman -Syu --needed git github-cli python curl' >&2; exit 1; }
+command -v python3 >/dev/null || { echo 'Install python first: pacman -Syu --needed git python curl' >&2; exit 1; }
+task_tmp=$(mktemp -d)
+trap 'rm -rf -- "$task_tmp"' EXIT
+if command -v pkexec >/dev/null 2>&1 && [[ -n ${WAYLAND_DISPLAY:-}${DISPLAY:-} ]]; then
+    mkdir "$task_tmp/bin"
+    install -m 700 "$repo_dir/scripts/pkexec-sudo" "$task_tmp/bin/sudo"
+    export PATH="$task_tmp/bin:$PATH"
+else
+    echo 'Enter your password in this terminal when sudo prompts.'
+fi
 # Arch librime includes librime-lua.so; it is not a separate librime-lua package.
 sudo pacman -Syu --needed git python curl github-cli rclone fcitx5 fcitx5-rime fcitx5-configtool \
     fcitx5-gtk fcitx5-qt librime xorg-xrdb xwayland-satellite \
     xdg-desktop-portal-gnome xdg-desktop-portal-gtk xdg-user-dirs \
     polkit polkit-kde-agent flatpak breeze breeze-gtk plasma-integration dolphin nautilus papirus-icon-theme smplayer konsole alacritty fuzzel \
     noto-fonts noto-fonts-cjk noto-fonts-emoji fontconfig kconfig python-gobject \
-    wl-clipboard swaylock playerctl brightnessctl fd libqalculate
+    wl-clipboard swaylock playerctl brightnessctl fd libqalculate kitty fish fuse3 \
+    base-devel cmake ninja pkgconf clang rust wayland wayland-protocols \
+    libinput libxkbcommon libdisplay-info seatd libpipewire pango cairo mesa \
+    qt6-base qt6-declarative qt6-wayland qt6-shadertools qt6-tools qtkeychain-qt6 glib2 \
+    librsvg gtk-update-icon-cache
 # CachyOS and other configured repositories may provide a current niri-git
 # package. Install it before the upstream resolver so its `niri` provide is
 # used; plain Arch falls back to the stable niri package from the installer.
@@ -18,8 +31,6 @@ if pacman -Si niri-git >/dev/null 2>&1; then
     sudo pacman -S --needed niri-git
 fi
 release=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["arch_installer"]["release"])' "$repo_dir/sources.lock.json")
-task_tmp=$(mktemp -d)
-trap 'rm -rf -- "$task_tmp"' EXIT
 base_url="https://github.com/StatIndet/quickshell/releases/download/$release"
 curl --fail --location "$base_url/install-arch.sh" -o "$task_tmp/install-arch.sh"
 curl --fail --location "$base_url/SHA256SUMS" -o "$task_tmp/SHA256SUMS"

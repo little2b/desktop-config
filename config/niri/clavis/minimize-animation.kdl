@@ -1,0 +1,5 @@
+// Managed by Clavis.
+
+animations {
+    window-minimize-effect "genie";
+};

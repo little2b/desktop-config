@@ -80,22 +80,22 @@
       "yazi": true
     },
     "mode": "light",
-    "superKeyStyle": "text",
+    "superKeyStyle": "arch",
     "lockScreenStyle": "default",
-    "cursorTheme": "capitaine-cursors",
+    "cursorTheme": "breeze_cursors",
     "cursorSize": 24,
     "cursorHideWhenTyping": false,
     "cursorHideAfterInactiveMs": 0,
-    "iconTheme": "",
+    "iconTheme": "MacTahoe-light",
     "fonts": {
-      "ui": "LXGW WenKai GB Screen",
-      "mono": "JetBrainsMono Nerd Font Mono",
-      "numeric": "JetBrainsMono Nerd Font Mono",
+      "ui": "Noto Sans CJK SC",
+      "mono": "Noto Sans CJK SC",
+      "numeric": "Noto Sans CJK SC",
       "expressive": "Google Sans Flex"
     }
   },
   "effects": {
-    "shellBackgroundOpacity": 0.18,
+    "shellBackgroundOpacity": 0.26,
     "shellBlurEnabled": true,
     "shellBlurXray": false
   },

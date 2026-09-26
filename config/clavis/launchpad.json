@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "kind": "folder",
+      "id": "group-1790233725220-q2btp3",
+      "name": "Folder",
+      "children": [
+        "cups",
+        "org.kde.kmenuedit",
+        "kbd-layout-viewer5",
+        "org.pulseaudio.pavucontrol",
+        "bssh",
+        "avahi-discover",
+        "fcitx5-configtool",
+        "org.fcitx.fcitx5-migrator",
+        "btop",
+        "bvnc",
+        "btrfs-assistant",
+        "org.kde.ark",
+        "org.kde.plasma-systemmonitor",
+        "org.kde.kate",
+        "org.kde.partitionmanager",
+        "org.kde.kcalc",
+        "org.kde.kdeconnect.app",
+        "org.kde.haruna",
+        "org.kde.kdeconnect.nonplasma",
+        "org.kde.kwrite",
+        "org.kde.kwalletmanager",
+        "org.kde.kdeconnect.sms",
+        "org.kde.kinfocenter",
+        "com.shellyorg.shelly",
+        "qdbusviewer",
+        "linguist",
+        "designer",
+        "qvidcap",
+        "qv4l2",
+        "org.gnome.Meld",
+        "micro",
+        "assistant",
+        "org.kde.spectacle",
+        "vim",
+        "lstopo",
+        "org.kde.gwenview",
+        "org.cachyos.scx-manager",
+        "mpv",
+        "org.kde.filelight"
+      ]
+    },
+    {
+      "kind": "folder",
+      "id": "group-1790233783373-yfmib6",
+      "name": "Folder",
+      "children": [
+        "libreoffice-math",
+        "libreoffice-impress",
+        "libreoffice-writer",
+        "libreoffice-calc",
+        "libreoffice-base",
+        "libreoffice-draw",
+        "libreoffice-startcenter"
+      ]
+    },
+    {
+      "kind": "folder",
+      "id": "group-1790233812285-93x1bi",
+      "name": "Folder",
+      "children": [
+        "wps-office-pdf",
+        "wps-office-et",
+        "wps-office-prometheus",
+        "wps-office-wpp",
+        "wps-office-wps"
+      ]
+    },
+    {
+      "kind": "app",
+      "id": "quark-drive"
+    },
+    {
+      "kind": "app",
+      "id": "wemeetapp"
+    },
+    {
+      "kind": "app",
+      "id": "wechat"
+    },
+    {
+      "kind": "app",
+      "id": "org.gnome.Nautilus"
+    },
+    {
+      "kind": "app",
+      "id": "abdownloadmanager"
+    },
+    {
+      "kind": "app",
+      "id": "Alacritty"
+    },
+    {
+      "kind": "app",
+      "id": "antigravity"
+    },
+    {
+      "kind": "app",
+      "id": "arch-update"
+    },
+    {
+      "kind": "app",
+      "id": "cachyos-hello"
+    },
+    {
+      "kind": "app",
+      "id": "org.cachyos.KernelManager"
+    },
+    {
+      "kind": "app",
+      "id": "cachyos-pi"
+    },
+    {
+      "kind": "app",
+      "id": "chatgpt"
+    },
+    {
+      "kind": "app",
+      "id": "Clash Verge"
+    },
+    {
+      "kind": "app",
+      "id": "cmake-gui"
+    },
+    {
+      "kind": "app",
+      "id": "Cockpit Tools"
+    },
+    {
+      "kind": "app",
+      "id": "org.kde.plasma.emojier"
+    },
+    {
+      "kind": "app",
+      "id": "org.kde.dolphin"
+    },
+    {
+      "kind": "app",
+      "id": "firefox"
+    },
+    {
+      "kind": "app",
+      "id": "google-chrome"
+    },
+    {
+      "kind": "folder",
+      "id": "group-1790264558394-mbl69f",
+      "name": "文件夹",
+      "children": [
+        "kdesystemsettings",
+        "org.clavis.Settings",
+        "systemsettings"
+      ]
+    },
+    {
+      "kind": "app",
+      "id": "kitty"
+    },
+    {
+      "kind": "app",
+      "id": "org.kde.konsole"
+    },
+    {
+      "kind": "app",
+      "id": "com.pylogmon.Manggo"
+    },
+    {
+      "kind": "app",
+      "id": "OpenList-Desktop"
+    },
+    {
+      "kind": "app",
+      "id": "qq"
+    },
+    {
+      "kind": "app",
+      "id": "org.remmina.Remmina"
+    },
+    {
+      "kind": "app",
+      "id": "smplayer"
+    },
+    {
+      "kind": "app",
+      "id": "SPlayer"
+    },
+    {
+      "kind": "app",
+      "id": "com.microsoft.VSCode"
+    },
+    {
+      "kind": "app",
+      "id": "zotero"
+    }
+  ]
+}

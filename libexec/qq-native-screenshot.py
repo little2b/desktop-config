@@ -2,14 +2,18 @@
 """User-invoked Niri binding for QQ's native Ctrl+Alt+A screenshot action.
 
 Deliver the accelerator to QQ's X server without focusing its chat window.
-Only a newly opened, untitled QQ capture overlay may be moved afterwards.
+Use only the focused output during capture, then restore displays/workspaces.
+Only a newly opened, untitled QQ capture overlay is relocated for the capture.
 """
 import ctypes as C
 import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
 import socket
+import select
+import signal
 import subprocess
 import sys
 import tempfile
@@ -64,6 +68,22 @@ class X11:
         window, revert = C.c_ulong(), C.c_int()
         self.x.XGetInputFocus(self.d, C.byref(window), C.byref(revert))
         return window.value, revert.value
+
+    def monitor_count(self):
+        class ScreenInfo(C.Structure):
+            _fields_ = [('number', C.c_int), ('x', C.c_short), ('y', C.c_short),
+                        ('width', C.c_short), ('height', C.c_short)]
+        library = C.CDLL('libXinerama.so.1')
+        library.XineramaQueryScreens.argtypes = [C.c_void_p, C.POINTER(C.c_int)]
+        library.XineramaQueryScreens.restype = C.POINTER(ScreenInfo)
+        self.x.XFree.argtypes = [C.c_void_p]
+        count = C.c_int()
+        screens = library.XineramaQueryScreens(self.d, C.byref(count))
+        try:
+            return count.value
+        finally:
+            if screens:
+                self.x.XFree(screens)
 
     def screenshot(self):
         root = self.x.XDefaultRootWindow(self.d)
@@ -240,7 +260,185 @@ def niri(request):
     return result['Ok']
 
 
+def active_outputs(outputs):
+    return {name: output for name, output in outputs.items()
+            if output.get('current_mode') is not None and output.get('logical')}
+
+
+def same_output(before, after):
+    return after and all(before.get(key) == after.get(key) for key in ('make', 'model', 'serial'))
+
+
+def output_action(name, action):
+    niri({'Output': {'output': name, 'action': action}})
+
+
+def wait_outputs(names, timeout=8):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        outputs = niri('Outputs')['Outputs']
+        if names.issubset(active_outputs(outputs)):
+            return outputs
+        time.sleep(0.1)
+    raise RuntimeError('显示器未能及时恢复。请在显示器设置中检查。')
+
+
+def restore_displays(snapshot):
+    errors = []
+    outputs = niri('Outputs')['Outputs']
+    restore_names = set()
+    for name in snapshot['disabled']:
+        saved = snapshot['outputs'][name]
+        if not same_output(saved, outputs.get(name)):
+            continue  # Unplugged or replaced displays must not be reconfigured.
+        try:
+            if name not in active_outputs(outputs):
+                output_action(name, 'On')
+            restore_names.add(name)
+        except (OSError, RuntimeError) as error:
+            errors.append(str(error))
+    try:
+        outputs = wait_outputs(restore_names)
+    except (OSError, RuntimeError) as error:
+        errors.append(str(error))
+        outputs = niri('Outputs')['Outputs']
+    available = active_outputs(outputs)
+    for name, saved in snapshot['outputs'].items():
+        if name not in available or not same_output(saved, available[name]):
+            continue
+        position = {key: saved['logical'][key] for key in ('x', 'y')}
+        current = {key: available[name]['logical'][key] for key in ('x', 'y')}
+        if current != position:
+            try:
+                output_action(name, {'Position': {'position': {'Specific': position}}})
+            except (OSError, RuntimeError) as error:
+                errors.append(str(error))
+    current = {w['id']: w for w in niri('Workspaces')['Workspaces']}
+    for workspace in sorted(snapshot['workspaces'], key=lambda w: w['idx']):
+        name = workspace['output']
+        if name not in restore_names or name not in available or workspace['id'] not in current:
+            continue
+        if current[workspace['id']]['output'] != name:
+            try:
+                niri({'Action': {'MoveWorkspaceToMonitor': {
+                    'output': name, 'reference': {'Id': workspace['id']}}}})
+            except (OSError, RuntimeError) as error:
+                errors.append(str(error))
+    focused = snapshot['focused']
+    if focused in current:
+        try:
+            niri({'Action': {'FocusWorkspace': {'reference': {'Id': focused}}}})
+        except (OSError, RuntimeError) as error:
+            errors.append(str(error))
+    if errors:
+        raise RuntimeError('恢复显示器时出现错误：' + '; '.join(errors))
+
+
+def recovery_guard(snapshot):
+    # EOF means completion or parent death. The deadline also covers a hung
+    # capture process. Inherited locks prevent competing captures/migrations.
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    select.select([sys.stdin], [], [], 210)
+    try:
+        restore_displays(snapshot)
+        result = {'ok': True}
+    except (OSError, RuntimeError, KeyError) as error:
+        result = {'ok': False, 'error': str(error)}
+        subprocess.run(['notify-send', '--app-name=QQ', 'QQ 显示器恢复提示', str(error)], check=False)
+    try:
+        print(json.dumps(result, ensure_ascii=False), flush=True)
+    except BrokenPipeError:
+        pass  # The parent may have died; restoration still succeeded.
+
+
+class SingleOutputCapture:
+    def __init__(self, capture_lock):
+        self.capture_lock = capture_lock
+        self.migration_lock = None
+        self.guard = None
+        self.snapshot = None
+
+    def __enter__(self):
+        # Clavis's existing cross-process lock keeps its preferred-display
+        # watcher from interpreting this temporary disconnect as a hotplug.
+        config = Path(os.environ.get('CLAVIS_CONFIG_HOME', Path.home() / '.config/clavis')) / 'primary-display.json'
+        key = hashlib.sha256((str(config) + os.environ['NIRI_SOCKET']).encode()).hexdigest()[:20]
+        path = Path(os.environ['XDG_RUNTIME_DIR']) / ('clavis-primary-' + key + '.lock')
+        self.migration_lock = os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        try:
+            try:
+                fcntl.flock(self.migration_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as error:
+                raise RuntimeError('正在调整主显示器，请稍后重试截图。') from error
+            outputs = active_outputs(niri('Outputs')['Outputs'])
+            workspaces = niri('Workspaces')['Workspaces']
+            workspace = next(w for w in workspaces if w['is_focused'])
+            target = workspace['output']
+            if target not in outputs:
+                raise RuntimeError('当前屏幕不可用，请稍后重试截图。')
+            self.workspace = workspace
+            disabled = [name for name in outputs if name != target]
+            self.snapshot = {
+                'outputs': {name: {key: value.get(key) for key in ('make', 'model', 'serial', 'logical')}
+                            for name, value in outputs.items()},
+                'disabled': disabled,
+                'workspaces': [{key: value[key] for key in ('id', 'idx', 'output')} for value in workspaces],
+                'focused': workspace['id'],
+            }
+            if disabled:
+                self.guard = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
+                    '--restore-displays', json.dumps(self.snapshot)], stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, start_new_session=True,
+                    pass_fds=(self.capture_lock, self.migration_lock))
+                for name in disabled:
+                    output_action(name, 'Off')
+            else:
+                os.close(self.migration_lock)
+                self.migration_lock = None
+            return self
+        except BaseException:
+            self.__exit__(*sys.exc_info())
+            raise
+
+    def wait_ready(self, x11):
+        if not self.snapshot['disabled']:
+            return
+        deadline = time.monotonic() + 8
+        stable = None
+        while time.monotonic() < deadline:
+            active = active_outputs(niri('Outputs')['Outputs'])
+            if set(active) == {self.workspace['output']} and x11.monitor_count() == 1:
+                if stable is None:
+                    stable = time.monotonic()
+                if time.monotonic() - stable >= 0.6:
+                    niri({'Action': {'FocusWorkspace': {'reference': {'Id': self.workspace['id']}}}})
+                    return
+            else:
+                stable = None
+            time.sleep(0.1)
+        raise RuntimeError('QQ 的单屏截图环境未能准备完成，已请求恢复显示器。')
+
+    def __exit__(self, *exception):
+        try:
+            if self.guard:
+                try:
+                    output, _ = self.guard.communicate(timeout=35)
+                    result = json.loads(output)
+                except (subprocess.SubprocessError, ValueError) as error:
+                    raise RuntimeError('未收到显示器恢复确认，请在显示器设置中检查。') from error
+                if not result.get('ok'):
+                    raise RuntimeError(result.get('error', '未能恢复显示器。'))
+        finally:
+            if self.migration_lock is not None:
+                os.close(self.migration_lock)
+                self.migration_lock = None
+
+
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == '--restore-displays':
+        recovery_guard(json.loads(sys.argv[2]))
+        return
     display = qq_display()
     if sys.argv[1:] == ['--check']:
         x = X11(display)
@@ -255,56 +453,67 @@ def main():
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             return
-        workspaces = niri('Workspaces')['Workspaces']
-        workspace = next(w for w in workspaces if w['is_focused'])
-        old_ids = {w['id'] for w in niri('Windows')['Windows']}
-        x = X11(display)
-        clipboard = None
-        try:
-            clipboard = ClipboardBridge(display, x)
-            clipboard.arm()
-            x.screenshot()
-            deadline = time.monotonic() + 4
-            overlay = None
-            while time.monotonic() < deadline:
-                clipboard.pump()
-                for window in niri('Windows')['Windows']:
-                    if window['id'] not in old_ids and window['app_id'] == 'QQ' and not window['title']:
-                        overlay = window['id']
-                        if window['workspace_id'] != workspace['id']:
-                            niri({'Action': {'MoveWindowToWorkspace': {
-                                'window_id': overlay, 'reference': {'Id': workspace['id']}, 'focus': True}}})
-                            niri({'Action': {'FocusWindow': {'id': overlay}}})
-                        break
-                if overlay is not None:
+        with SingleOutputCapture(lock.fileno()) as capture:
+            take_screenshot(display, capture)
+
+
+def take_screenshot(display, capture):
+    workspace = capture.workspace
+    old_ids = {w['id'] for w in niri('Windows')['Windows']}
+    x = X11(display)
+    clipboard = None
+    try:
+        capture.wait_ready(x)
+        clipboard = ClipboardBridge(display, x)
+        clipboard.arm()
+        x.screenshot()
+        deadline = time.monotonic() + 4
+        overlay = None
+        while time.monotonic() < deadline:
+            clipboard.pump()
+            for window in niri('Windows')['Windows']:
+                if window['id'] not in old_ids and window['app_id'] == 'QQ' and not window['title']:
+                    overlay = window['id']
+                    if window['workspace_id'] != workspace['id']:
+                        niri({'Action': {'MoveWindowToWorkspace': {
+                            'window_id': overlay, 'reference': {'Id': workspace['id']}, 'focus': True}}})
+                        niri({'Action': {'FocusWindow': {'id': overlay}}})
                     break
-                time.sleep(0.08)
-            if overlay is None:
-                raise RuntimeError('QQ 未弹出截图界面。请确认 QQ 内的截图快捷键为 Ctrl+Alt+A。')
-            # Keep the observer only for this capture. Cancellation does not
-            # publish anything, and transfers from other applications are ignored.
-            deadline = time.monotonic() + 180
-            closed_at = None
-            while time.monotonic() < deadline:
-                clipboard.pump()
-                if clipboard.error:
-                    raise RuntimeError(clipboard.error)
-                if clipboard.copied:
+            if overlay is not None:
+                break
+            time.sleep(0.08)
+        if overlay is None:
+            raise RuntimeError('QQ 未弹出截图界面。请确认 QQ 内的截图快捷键为 Ctrl+Alt+A。')
+        # Keep the observer only for this capture. Cancellation does not
+        # publish anything, and transfers from other applications are ignored.
+        deadline = time.monotonic() + 180
+        closed_at = None
+        while time.monotonic() < deadline:
+            clipboard.pump()
+            if clipboard.error:
+                raise RuntimeError(clipboard.error)
+            if clipboard.copied:
+                return
+            if not any(w['id'] == overlay for w in niri('Windows')['Windows']):
+                closed_at = closed_at or time.monotonic()
+                if time.monotonic() - closed_at > 3:
                     return
-                if not any(w['id'] == overlay for w in niri('Windows')['Windows']):
-                    closed_at = closed_at or time.monotonic()
-                    if time.monotonic() - closed_at > 3:
-                        return
-                time.sleep(0.08)
-        finally:
-            if clipboard:
-                clipboard.close()
-            x.close()
+            time.sleep(0.08)
+    finally:
+        if clipboard:
+            clipboard.close()
+        x.close()
 
 
 if __name__ == '__main__':
     try:
+        if '--restore-displays' not in sys.argv:
+            def interrupted(signum, frame):
+                raise KeyboardInterrupt
+            signal.signal(signal.SIGTERM, interrupted)
         main()
+    except KeyboardInterrupt:
+        raise SystemExit(130)
     except (OSError, RuntimeError, KeyError, StopIteration) as error:
         print(str(error), file=sys.stderr)
         subprocess.run(['notify-send', '--app-name=QQ', 'QQ 截图提示', str(error)], check=False)

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "options": {
+    "enabled": true,
+    "position": "bottom",
+    "iconSize": 32,
+    "magnification": true,
+    "magnificationScale": 1.5,
+    "autoHide": true,
+    "launchBounce": true,
+    "showIndicators": true,
+    "showRecent": false,
+    "showThumbnails": true,
+    "previewSize": 160,
+    "contextPinning": true
+  },
+  "pinned": [
+    {
+      "kind": "app",
+      "desktopId": "org.clavis.Launchpad"
+    },
+    {
+      "kind": "app",
+      "desktopId": "google-chrome"
+    },
+    {
+      "kind": "app",
+      "desktopId": "qq"
+    },
+    {
+      "kind": "app",
+      "desktopId": "wechat"
+    },
+    {
+      "kind": "app",
+      "desktopId": "org.gnome.Nautilus"
+    },
+    {
+      "kind": "app",
+      "desktopId": "chatgpt"
+    }
+  ]
+}

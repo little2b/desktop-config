@@ -24,20 +24,25 @@ class RestoreTests(unittest.TestCase):
         self.assertFalse(self.target.exists())
 
     def test_restore_rebases_paths_and_preserves_existing_file(self):
-        destination = self.target / '.config/quickshell/nyx-dock/settings.json'
+        destination = self.target / '.config/clavis/dock.json'
         destination.parent.mkdir(parents=True)
         destination.write_text('{"existing": true}')
         old_db = self.target / '.local/share/fcitx5/rime/rime_ice.userdb'
         old_db.mkdir(parents=True)
         (old_db / '999999.log').write_bytes(b'old database log')
         backup = restore.restore(self.target, same_hardware=True, apply=True)
-        self.assertEqual((backup / '.config/quickshell/nyx-dock/settings.json').read_text(), '{"existing": true}')
+        self.assertEqual((backup / '.config/clavis/dock.json').read_text(), '{"existing": true}')
         desktop = configparser.ConfigParser(interpolation=None)
         desktop.read(self.target / '.local/share/applications/org.kde.dolphin.desktop')
         self.assertEqual(shlex.split(desktop['Desktop Entry']['Exec'])[0], str(self.target / '.local/bin/dolphin'))
         desktop.read(self.target / '.local/share/applications/org.kde.konsole.desktop')
         self.assertEqual(desktop['Desktop Entry']['TryExec'], '/usr/bin/konsole')
-        self.assertTrue((self.target / '.local/lib/nyx-dock/uninstall-app.py').is_file())
+        dock = json.loads((self.target / '.config/clavis/dock.json').read_text())
+        self.assertIn('org.clavis.Launchpad', [entry.get('desktopId') for entry in dock['pinned']])
+        self.assertEqual(json.loads((self.target / '.config/clavis/launchpad.json').read_text()),
+                         json.loads((ROOT / 'config/clavis/launchpad.json').read_text()))
+        self.assertFalse((self.target / '.config/systemd/user/nyx-dock.service').exists())
+        self.assertIn('niri-desktop/niri', (self.target / '.local/bin/niri').read_text())
         config = json.loads((self.target / '.config/clavis/config.json').read_text())
         self.assertTrue(Path(config['wallpaper']['path']).is_file())
         self.assertEqual(config['wallpaper']['folder'], str(self.target / 'Pictures/Wallpapers'))
@@ -57,6 +62,17 @@ class RestoreTests(unittest.TestCase):
         self.assertIsNone(prefs['primary'])
         self.assertNotIn(b'output "', files[Path('.config/niri/clavis/outputs.kdl')][0])
         self.assertEqual(json.loads(files[Path('.config/clavis/ui-preferences.json')][0])['systemMonitorDiskDevice'], '')
+        self.assertNotIn(b'gtk-xft-dpi=', files[Path('.config/gtk-4.0/settings.ini')][0])
+        self.assertNotIn(b'Xft.dpi:', files[Path('.config/fcitx5/x11-dpi.Xresources')][0])
+
+    def test_restore_keeps_all_required_niri_fragments_and_gtk_customization(self):
+        files = restore.plan(self.target)
+        for name in ['outputs', 'mouse', 'cursor', 'layer-rules', 'effects', 'minimize-animation']:
+            self.assertIn(Path(f'.config/niri/clavis/{name}.kdl'), files)
+        self.assertIn(b'reference-nautilus.css', files[Path('.config/gtk-4.0/gtk.css')][0])
+        settings = configparser.ConfigParser()
+        settings.read_string(files[Path('.config/kded5rc')][0].decode())
+        self.assertFalse(settings.getboolean('Module-gtkconfig', 'autoload'))
 
     def test_parent_symlink_cannot_escape_target(self):
         self.target.mkdir(parents=True)

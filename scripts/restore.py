@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def verify(root=ROOT):
     manifest = json.loads((root / 'manifest.json').read_text())
-    actual = {str(p.relative_to(root)) for directory in ['config', 'share', 'lib', 'libexec', 'bin', 'rime', 'assets', 'hardware', 'system-reference']
+    actual = {str(p.relative_to(root)) for directory in ['config', 'share', 'lib', 'libexec', 'bin', 'rime', 'assets', 'hardware', 'system-reference', 'patches']
               for p in (root / directory).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc'}
     actual.add('sources.lock.json')
     if actual != set(manifest['sha256']):
@@ -63,6 +63,10 @@ def plan(target_home, same_hardware=False, root=ROOT):
             settings = json.loads(data)
             settings.update(json.loads((root / 'hardware/monitor-metrics.json').read_text()))
             data = (json.dumps(settings, ensure_ascii=False, indent=2) + '\n').encode()
+        if not same_hardware and relative in [Path('.config/gtk-3.0/settings.ini'), Path('.config/gtk-4.0/settings.ini')]:
+            data = b'\n'.join(line for line in data.splitlines() if not line.startswith(b'gtk-xft-dpi=')) + b'\n'
+        if not same_hardware and relative == Path('.config/fcitx5/x11-dpi.Xresources'):
+            data = b'! Set Xft.dpi here after choosing scaling for this computer.\n'
         if relative.suffix == '.json':
             json.loads(data)
         rendered[relative] = (data, mode)
@@ -141,7 +145,7 @@ def restore(target_home, same_hardware=False, apply=False, root=ROOT):
         finally:
             Path(temporary).unlink(missing_ok=True)
     print(f'Restored. Previous files: {backup}')
-    print('Next: build-clavis.sh, then enable-services.sh. No system power policy was applied.')
+    print('Next: build-niri.sh, install-icon-theme.sh, build-clavis.sh, then enable-services.sh.')
     return backup
 
 

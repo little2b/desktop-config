@@ -1,150 +1,128 @@
-# 个人 Niri / Clavis 桌面迁移配置
+# 个人 CachyOS / Arch · Niri / Clavis 桌面
 
-这个仓库保存独立 Dock、本机桌面设置及迁移资源。仓库当前为**公开**，新增快照不包含账号凭据或历史记录。Clavis 应用源码在
-[little2b/quickshell 的 personal/fedora-niri 分支](https://github.com/little2b/quickshell/tree/personal/fedora-niri)。
-两者配合恢复整套桌面。新增功能入口与当前启用状态见 [FEATURES.md](FEATURES.md)。`sources.lock.json` 固定了本快照对应的 Clavis 提交。
+这个公开仓库保存当前桌面的可迁移配置、主题资源和安装脚本。桌面源码位于
+[little2b/quickshell](https://github.com/little2b/quickshell/tree/personal/fedora-niri)，
+本仓库通过 `sources.lock.json` 固定 Clavis、定制 Niri、key-cli 和 MacTahoe 图标的版本。
 
-## 在同一台电脑上从 Fedora 换到 Arch
+## 在另一台电脑上安装
 
-先完成 Arch 的基础安装、网络、显卡驱动及中文 UTF-8 locale，然后以日常桌面用户运行：
+目标系统需要先装好 **CachyOS 或 Arch Linux**、网络和显卡驱动。以日常用户运行：
 
 ```bash
-sudo pacman -Syu --needed git github-cli python curl
-gh auth login
-gh auth setup-git
-gh repo clone little2b/desktop-config
+sudo pacman -Syu --needed git python curl
+git clone https://github.com/little2b/desktop-config.git
 cd desktop-config
-./scripts/setup-arch.sh --same-hardware
+./scripts/setup-arch.sh
 ```
 
-脚本依次安装依赖、恢复配置、编译定制 Clavis、启用用户服务。使用已校验 SHA-256
-的上游 Arch 安装器安装依赖，并保留自己的 Clavis 源码入口。AUR 构建和软件包下载
-需要网络和时间；安装器可能请求 sudo。**不要在当前 Fedora 上执行 Arch 安装脚本。**
+仓库公开，无需登录 GitHub。图形会话里的安装步骤优先使用 `pkexec` 密码框；
+没有图形认证环境时在终端输入 sudo 密码。不要以 root 身份运行整个安装脚本。
+软件包下载、Niri 的 Rust 编译和 Clavis 的 Qt 编译需要时间、网络以及数 GB 可用磁盘。
 
-完成后在登录界面选择 **Niri** 会话。若没有登录管理器，可从 TTY 按 Arch 的 Niri
-会话方式启动 `niri-session`。使用 `niri.service` 管理的会话，才能自动启动关联服务。
+**换电脑使用上面的默认命令，不加 `--same-hardware`。** 显示器布局、主屏选择、
+设备指标绑定及原机器的 GTK/X11 DPI 将重置，进入桌面后按新显示器设置缩放。
+只有同一台电脑重装、且显示器不变时，才使用 `./scripts/setup-arch.sh --same-hardware`。
 
-换了电脑或显示器时去掉 `--same-hardware`，显示器和设备绑定会留待重新设置；
-同一台笔记本重装时使用该参数，可保留 200% 缩放、显示器排列、主屏和指标设备选择。
+建议在新机器的 TTY 或其他桌面会话中安装。完成后退出当前会话，在登录界面选择
+**Niri**；没有登录管理器时从 TTY 运行 `niri-session`。脚本不配置自动登录或磁盘休眠。
 
-## 本次桌面行为
+安装流程依次完成：
 
-- 普通窗口使用 8 像素圆角、柔和阴影和 2 像素聚焦边框；设置类窗口默认浮动。
-- 点击应用自己的最大化按钮后占满屏幕，保留浏览器标签栏与地址栏。
-  顶栏自动收起，鼠标移到边缘可唤出；还原窗口后恢复显示。
-- 最大化时收到新通知，中间组件短暂显示，约 7 秒后自动收起；遵守勿扰模式，
-  通知侧栏已打开时不重复弹出。通知侧栏快捷键为 **Win + N**。
-- 中间组件退出后撤下显示窗口，内容淡入完成后才启用背景模糊，避免留下壁纸轮廓。
+1. 校验快照并显示恢复计划，安装 Arch 依赖和固定版本的 key-cli。
+2. 备份目标电脑已有的同名文件，再恢复桌面设置。
+3. 编译固定版本的 `StatIndet/niri-edge` 并应用本仓库补丁；保留 Genie 最小化、
+   HiDPI 坐标修复和 PipeWire SHM 屏幕共享修复。
+4. 安装固定提交的 MacTahoe 图标主题，编译并安装 Clavis 原生模块。
+5. 校验 Niri 配置，启用 Clavis、剪贴板、Fcitx5 和主题同步服务。
+   旧独立 `nyx-dock.service` 会被关闭，避免出现两个 Dock。
 
-这些效果需要 **Niri 26.04 或更新版本**，以及上游安装器提供的 Quickshell 背景模糊支持。
-源码分支名虽然包含 `fedora`，迁移脚本会在 Arch 上重新编译原生模块并使用 Arch 配置。
+## 当前快照包含什么
 
-## 先查看计划或分步恢复
+| 部分 | 内容 |
+| --- | --- |
+| 原生 Dock | 固定应用、顺序、大小、放大、自动隐藏、窗口预览和最小化设置 |
+| 应用菜单 | Dock 入口、打开/翻页动画、搜索、应用排序和文件夹分组；布局保存在 `config/clavis/launchpad.json` |
+| 顶部组件 | 最大化时自动隐藏、边缘唤出、通知短暂显示、常驻歌词及菜单打开时的顶栏稳定处理 |
+| 文件管理器 | Nautilus 浅绿色界面、紫灰色 Clavis-Reference 图标，以及防止 KDE GTK 同步覆盖的设置 |
+| 图标与字体 | Clavis 使用 MacTahoe-light；保留 Noto Sans CJK、Google Sans Flex 等字体选择和字体配置 |
+| 终端 | Kitty、Alacritty 和 Konsole 的配色、透明度、字体、按键与主题同步 |
+| Niri | 快捷键、窗口规则、鼠标、光标、模糊和最小化动画配置 |
+| 输入法 | Fcitx5、雾凇拼音、跟随壁纸的候选框主题；保留仓库已有 Rime 快照 |
+| 壁纸与组件 | 当前壁纸、头像、天气位置、桌面卡片和侧栏设置 |
+| QQ / Manggo | 截图与翻译的辅助脚本、Niri 快捷键和 portal 注册 |
+| 网盘 | 夸克网盘入口和挂载服务定义；账号在新机重新配置 |
+
+Dock 与应用菜单只保存应用入口，不会安装所有固定的软件。Chrome、QQ、微信、
+WPS、Codex、腾讯会议等需另行安装；安装后的 desktop ID 不同时重新固定即可。
+未安装的应用在菜单中隐藏，安装后会按保存的布局恢复。
+
+没有上传登录密码、Cookie、API 密钥、SSH 密钥、GitHub/Codex 凭据、通知或剪贴板历史。
+Rclone / OpenList 等账号需要在新电脑重新授权；网盘挂载服务不会自动启动。
+字体和图标资源的许可证随资源保留；MacTahoe 从其固定的公开源码提交安装。
+
+## 预览与分步安装
 
 ```bash
-python3 scripts/restore.py --same-hardware
-# 上一条只显示计划，不写入文件。
+# 只显示计划，不写配置
+python3 scripts/restore.py
+
+# 试装到临时目录，不影响当前桌面
+python3 scripts/restore.py --target-home /tmp/clavis-preview --apply
+
+# 与 setup-arch.sh 相同的分步流程
 ./scripts/install-arch-dependencies.sh
 ./scripts/install-key-cli.sh
-python3 scripts/restore.py --apply --same-hardware
+python3 scripts/restore.py --apply
+./scripts/build-niri.sh
+./scripts/install-icon-theme.sh
 ./scripts/build-clavis.sh
 ./scripts/enable-services.sh
 ```
 
-恢复前若目标桌面已经在运行，先停止 `clavis-shell.service`、`nyx-dock.service`、
-`fcitx5-niri.service`、`nyx-theme-sync.path` 和 `nyx-theme-sync.service`。恢复程序会检查这一点并保留现有文件到
+恢复程序会检查目标桌面是否正在运行。若需要覆盖正在使用的配置，应先退出 Niri，
+或停止它列出的 Clavis、输入法和主题同步服务。旧文件保存在
 `~/.local/state/desktop-config-backups/`，不会清空整个配置目录。
-可用 `--target-home /tmp/desktop-preview` 试装到临时目录。
 
-源目录默认是 `~/.local/share/clavis-source`，也可用 `CLAVIS_SOURCE_DIR` 指定。
-构建程序不覆盖含有未提交修改的源码。原生库必须在 Arch 上编译；仓库不含 Fedora
-的 `.so`、可执行运行库或 Python 虚拟环境。构建并安装后，桌面入口指向这份源码。
+Clavis 源码默认放在 `~/.local/share/clavis-source`；用 `CLAVIS_SOURCE_DIR` 可以另选目录。
+Niri 源码默认放在 `~/.local/share/niri-desktop-source`；用 `NIRI_SOURCE_DIR` 可以另选目录。
+脚本拒绝覆盖已有的不同版本或本地修改。Niri 安装在用户目录，系统软件包保留，
+运行中的 compositor 不会被脚本强制重启。
 
-## 已包含
+## 新机器上的差异
 
-| 部分 | 内容 |
-|---|---|
-| 独立 Dock | 悬停保持显示、右键操作菜单、应用页面左键启动/右键菜单、拖拽分组、固定顺序及外观设置 |
-| 应用卸载 | Arch 的 pacman/AUR、Fedora 的 RPM 和 Flatpak 卸载确认；手动安装程序和网页应用显示处理提示 |
-| 文件管理器/终端 | 默认 Nautilus，浅色背景和紫灰色 Papirus 衍生图标；保留 Dolphin、Alacritty/Konsole 的主题同步 |
-| Niri | 快捷键、窗口规则、缩放与显示器布局、鼠标和光标配置 |
-| Clavis | 主题、侧栏、桌面卡片、时间卡片位置、输入偏好、电源设置、沙坪坝天气及网盘功能开关 |
-| 输入法 | Fcitx5 配置、雾凇拼音源码词库、自定义配置及一致性快照的用户词库 |
-| 外观资源 | 当前壁纸、头像、Clavis 字体与许可证、天气图标包、GTK/终端主题 |
-| 服务 | Clavis、剪贴板后端、独立 Dock、Fcitx5 和主题同步的用户服务 |
-| 系统参考 | 原来的合盖行为、休眠延迟配置，仅供重新设置参考 |
+- 本快照包含 `window-minimize-effect "genie"`，必须完成 `build-niri.sh` 后才使用该配置。
+  普通发行版 Niri 可能尚不支持这个选项，不能只复制配置而跳过构建。
+- 启用中文 UTF-8 locale（通常是 `zh_CN.UTF-8`）。网络、蓝牙、声卡驱动和休眠能力
+  由新系统设置；仓库不自动覆盖 `/etc`、bootloader、resume 或硬件授权。
+- 新电脑需要重新确认显示器缩放、布局、鼠标、功耗模式和合盖设置。
+  `system-reference/` 仅为原机器的电源策略参考。
+- QQ、微信、腾讯会议和 WPS 的专用二进制兼容环境不随配置上传。
+  QQ 的 `Ctrl+Alt+A` 辅助流程会临时关闭其他屏幕；完成、取消或超时后恢复。
+  QQ 应用内的截图按钮不会调用此流程。
+- `~/.local/bin` 需要位于 PATH 前部；Niri 配置和服务使用已恢复的包装入口。
 
-字体与天气图标的许可证随资源保留。雾凇拼音许可证见 `rime/LICENSE.rime-ice`。
-不包含通知/剪贴板历史、GitHub 凭据、SSH 密钥、RustDesk 连接密码或工作文档。
-Microsoft Office/WPS 字体及其他软件的账号、数据和授权需要单独迁移。
+## 刷新快照
 
-## Arch 上需要重新确认
-
-- 中文语言：在 `/etc/locale.gen` 启用 `zh_CN.UTF-8 UTF-8` 并运行 `sudo locale-gen`。
-  Dolphin 包装脚本使用该 locale。
-- 网络及蓝牙：按新系统的网络方案启用 NetworkManager/BlueZ；脚本不接管正在使用的网络服务。
-- 休眠：先配置新系统的 swap、resume 与启动参数。`system-reference/` 不会自动覆盖 `/etc`，
-  验证休眠后再从 Clavis 电源设置恢复合盖策略；不能照搬 Fedora 的引导设置。
-- 键盘指示灯、功耗采样：安装依赖时没有自动授予额外设备或文件读取权限。
-  普通输入法和 CPU 占用显示不依赖这些授权；需要相关功能时使用 key-cli/keytop 的授权方式。
-- Dock 固定项会保留，但对应软件必须另外安装；例如浏览器、WPS、微信、QQ、RustDesk、Codex。
-  安装后的 desktop ID 若不同，在 Dock 设置中重新选择对应应用。
-- 网盘：已启用 rclone 前端；在设置 → 高级 → 网盘中重新添加服务并授权。仓库不包含 rclone 账号配置、令牌或网盘文件。
-- RustDesk：重新安装后打开远程会话里的“缩放光标”，避免自适应画面下光标过大；连接凭据未上传。
-- 首次启动 Fcitx5 会重新部署雾凇拼音，稍等词库构建完成。Arch 的 `librime` 已包含 Lua 插件。
-
-## 后续修改和更新
-
-桌面设置快照采集于 2026-09-19；2026-09-20 将 Clavis 固定版本更新到个人提交 `64bdacb`，并修复 QQ 截图剪贴板同步成功后的超时误报。Clavis 已合入作者 `ac388ac`，包含四圆液态动画、文件搜索、换算工具和顶栏媒体控件。保留最大化时顶栏自动收起、浏览器标签栏、
-边缘唤出、通知短暂显示、圆角/阴影渲染与模糊残留修复，以及此前的侧栏、抽屉、
-滚动、通知布局和天气测试隔离。当前版本还包含显示器开关、模糊区域去重、歌词频谱按需刷新、封面加载优化、顶栏循环绑定和 QQ 激活修复，以及隐藏波浪进度条、加载指示器和波浪滑块时暂停动画。后续修改 Clavis 源码推送到 `quickshell` 的定制分支；修改本机 Dock 或桌面偏好后，在本仓库收集当前设置并提交：
+先提交并推送 Clavis 源码，再运行：
 
 ```bash
 python3 scripts/capture-current.py --apply
 python3 -m unittest discover -s tests -v
-python3 scripts/restore.py --same-hardware
+python3 scripts/restore.py
 git add .
 git commit -m '更新个人桌面配置'
 git push
 ```
 
-更新 Clavis 固定版本前，在独立源码目录验证新提交，再更新 `sources.lock.json`。
-不要将包含真实凭据的目录添加到本仓库。迁移前若当前桌面又有调整，需先刷新快照。
-
-`capture-current.py` 只收集明确的桌面设置、Dock 源码和卸载辅助程序；替换本机 Home 路径、
-移除 API 密钥/令牌字段，并清空网盘账号绑定。它不会停止输入法，也不会新增当前
-Rime 个人短语或用户数据库；仓库已有的词库快照保持不变。Clavis 源码必须先提交，快照才会
-记录对应提交，避免新系统构建出不同的桌面。现有 Arch 专用服务和主题同步适配会保留。
-
-应用卸载在 Arch 上使用 `pacman -R` 并保留确认步骤，AUR 安装的包也由 pacman 管理。
-它不会绕过软件包依赖保护或删除 Flatpak 个人数据。应用并非由软件包管理器安装时，
-菜单会给出安装位置和处理提示；不会猜测目录并递归删除。主题同步不依赖完整 Plasma
-桌面，缺少 `plasma-apply-colorscheme` 时使用 KDE 标准颜色配置与刷新信号。
-
-当前 CachyOS 快照使用 `niri-git`，包含 PipeWire SHM 屏幕共享支持。依赖脚本会在
-配置的软件仓库提供该包时优先安装；普通 Arch 仓库没有该包时仍使用稳定版 Niri。
-
-## 本次应用外观与网盘设置
-
-- Fcitx5 使用 `ClavisWallpaper` 主题。现有 `nyx-theme-sync.path` 监听 Clavis 调色板变化，
-  同步候选框和菜单颜色，并通过 D-Bus 重载 `classicui`，不重启输入法。
-  `UseAccentColor=False` 避免系统强调色覆盖壁纸颜色；横排、字体和输入方案保持个人设置。
-- Nautilus 是默认文件管理器，GTK 4 样式位于 `config/gtk-4.0/reference-nautilus.css`。
-  紫灰色图标位于 `share/icons/Clavis-Reference`，还需安装 Papirus 作为继承主题。
-- `bin/apply-desktop-preferences` 恢复已收集的 GNOME 外观、图标视图和文件关联；
-  `enable-services.sh` 会调用它，不导入整份 dconf 数据库。
-- `rclone-quark.service` 和“夸克网盘”入口已保存，保留当前挂载参数和 5 GiB 磁盘缓存目标。
-  新系统仍需自行配置 OpenList 及 rclone 的 `quark-openlist` WebDAV 连接。Cookie、密码、
-  rclone 配置和缓存文件均不在快照内；挂载服务不会被恢复脚本自动启动。
-- 新版 Spotlight 的文件搜索及换算需要 `sources.lock.json` 固定的 key-cli 源码。
-  `install-key-cli.sh` 调用它自己的安装器部署到 `/usr/local`，优先通过图形密码框认证；
-  不改设备权限、不启动服务。`bin/key` 与原生模块路径和当前安装保持一致。
-- Manggo 翻译与 QQ 原生截图的 Niri 快捷键、辅助脚本及 Manggo portal 注册已收集。
-  辅助脚本恢复至 `~/.local/libexec/`；需另行安装 QQ、Manggo 及 PyGObject/GTK 3、libXtst、wl-clipboard 等运行依赖。
-  快照不包含本机编译的 HiDPI XWayland 二进制，相关兼容运行时仍需单独重建。
+采集程序只收集明确的桌面配置，将 Home 路径替换成安装时展开的占位符，并清空凭据字段。
+它不停止输入法，也不新增当前 Rime 学习记录、账号库或应用数据。定制 Niri 的源码补丁
+在 `patches/niri-desktop.patch`；`sources.lock.json` 同时记录补丁的 SHA-256。
 
 ## 验证范围
 
-本仓库在 Fedora 上完成了配置校验和临时目录恢复测试，包括不同用户名/路径、原文件备份、
-硬件配置选择及清单校验；没有在全新 Arch 安装中实际运行完整的软件包安装和图形会话。
-`python3 -m unittest discover -s tests -v` 可重复运行文件恢复测试，不触碰当前桌面。
+Clavis 的构建和 25 项现有测试、迁移仓库的 20 项测试及 ShellCheck 均通过。
+已从远程获取固定的 Niri 源码并验证补丁可完整应用，安装器下载的 SHA-256 也已核对。
+在临时目录验证了不同用户名、含空格 Home 路径、原文件备份、原生 Dock 分组、主题
+及硬件重置后的恢复结果；恢复后的 Niri 配置通过当前定制版的语法校验。
+**尚未在另一台全新电脑实际执行完整安装和图形登录**；下载源、AUR 构建与新硬件驱动
+仍会影响安装结果。验证命令均不安装软件或修改当前桌面。

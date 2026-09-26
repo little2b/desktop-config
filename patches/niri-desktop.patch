@@ -1,0 +1,389 @@
+diff --git a/src/render_helpers/shaders/genie.frag b/src/render_helpers/shaders/genie.frag
+index 2d1913433b197e8fbe52a5bcfd8d1f1fa8cd1287..6e8384866fe1ee3f3e3950f21292241b86243e04 100644
+--- a/src/render_helpers/shaders/genie.frag
++++ b/src/render_helpers/shaders/genie.frag
+@@ -57,7 +57,8 @@ float funnel_pull(float distance) {
+ void main() {
+     vec4 w = axis_rect(window_rect);
+     vec4 t = axis_rect(target_rect);
+-    vec2 point = to_axis(area_origin + niri_v_coords * niri_size);
++    // niri_size is in physical pixels; the geometry uniforms are output-local logical units.
++    vec2 point = to_axis(area_origin + niri_v_coords * (niri_size / niri_scale));
+ 
+     float lead = smoothstep(0.0, 0.55, morph);
+     // Form the neck before drawing the trailing edge away from the window.
+diff --git a/src/screencasting/mod.rs b/src/screencasting/mod.rs
+index 465935de06e38157fe7894175989ebbcdd10902c..485515dd098f2c857bc3daeaf3ad13e478bacf07 100644
+--- a/src/screencasting/mod.rs
++++ b/src/screencasting/mod.rs
+@@ -154,7 +154,7 @@ impl State {
+             CastTarget::Nothing => {
+                 self.backend.with_primary_renderer(|renderer| {
+                     if cast.dequeue_buffer_and_clear(renderer) {
+-                        cast.last_frame_time = get_monotonic_time();
++                        cast.record_frame_time(get_monotonic_time());
+                     }
+                 });
+                 return;
+@@ -243,7 +243,7 @@ impl State {
+                     bbox.size,
+                     scale,
+                 ) {
+-                    cast.last_frame_time = get_monotonic_time();
++                    cast.record_frame_time(get_monotonic_time());
+                 }
+             });
+ 
+@@ -613,7 +613,7 @@ impl Niri {
+             let cursor_data = cursor_data.as_ref().unwrap();
+ 
+             if cast.dequeue_buffer_and_render(renderer, &elements, cursor_data, size, scale) {
+-                cast.last_frame_time = target_presentation_time;
++                cast.record_frame_time(target_presentation_time);
+             }
+         }
+         self.casting.casts = casts;
+@@ -698,7 +698,7 @@ impl Niri {
+             let cursor_data = CursorData::compute(&elements, main_start, pointer_location, scale);
+ 
+             if cast.dequeue_buffer_and_render(renderer, &elements, &cursor_data, bbox.size, scale) {
+-                cast.last_frame_time = target_presentation_time;
++                cast.record_frame_time(target_presentation_time);
+             }
+         }
+         self.casting.casts = casts;
+diff --git a/src/screencasting/pw_utils.rs b/src/screencasting/pw_utils.rs
+index fab3fda116590a7df1752a9c98eccc6a75695c59..a4d2aa95d0c4616d8fa9b554033351fe44c6805c 100644
+--- a/src/screencasting/pw_utils.rs
++++ b/src/screencasting/pw_utils.rs
+@@ -50,7 +50,6 @@ use smithay::reexports::rustix::fd::OwnedFd;
+ use smithay::reexports::rustix::fs::{
+     fcntl_add_seals, ftruncate, memfd_create, MemfdFlags, SealFlags,
+ };
+-use smithay::reexports::rustix::mm::{mmap, munmap, MapFlags, ProtFlags};
+ use smithay::utils::{DeviceFd, Logical, Physical, Point, Scale, Size, Transform};
+ use zbus::object_server::SignalEmitter;
+ 
+@@ -63,6 +62,9 @@ use crate::render_helpers::{
+ use crate::screencasting::CastRenderElement;
+ use crate::utils::{get_monotonic_time, CastSessionId, CastStreamId};
+ 
++mod shm_mapping;
++use shm_mapping::ShmMapping;
++
+ // Give a 0.1 ms allowance for presentation time errors.
+ const CAST_DELAY_ALLOWANCE: Duration = Duration::from_micros(100);
+ const SHM_BLOCKS: usize = 1;
+@@ -104,7 +106,8 @@ pub struct Cast {
+     formats: FormatSet,
+     offer_alpha: bool,
+     cursor_mode: CursorMode,
+-    pub last_frame_time: Duration,
++    last_frame_time: Duration,
++    last_frame_interval: Duration,
+     scheduled_redraw: Option<RegistrationToken>,
+     // Incremented once per successful frame, stored in buffer meta.
+     sequence_counter: u64,
+@@ -944,6 +947,7 @@ impl PipeWire {
+             offer_alpha: alpha,
+             cursor_mode,
+             last_frame_time: Duration::ZERO,
++            last_frame_interval: Duration::ZERO,
+             scheduled_redraw: None,
+             sequence_counter: 0,
+             inner,
+@@ -1017,6 +1021,25 @@ impl Cast {
+         Ok(())
+     }
+ 
++    pub fn record_frame_time(&mut self, recorded: Duration) {
++        let interval = self.inner.borrow().min_time_between_frames;
++        let ideal = self.last_frame_time + interval;
++
++        // Absorb small (< 1 frame) differences in output refresh interval vs. screencast framerate
++        // to keep the screencast time base consistent instead of shifting forward every frame.
++        //
++        // After a missed interval or a rate change, restart instead of catching up in a burst.
++        self.last_frame_time = if self.last_frame_interval == interval
++            && recorded >= self.last_frame_time
++            && recorded < ideal + interval
++        {
++            ideal
++        } else {
++            recorded
++        };
++        self.last_frame_interval = interval;
++    }
++
+     fn compute_extra_delay(&self, target_frame_time: Duration) -> Duration {
+         let inner = self.inner.borrow();
+ 
+@@ -1292,7 +1315,7 @@ impl Cast {
+                         .map(|x| (x, SharingBuf::Dma))
+                 }
+                 x if x == DataType::MemFd.as_raw() => {
+-                    let shmbuf = inner_.shmbufs[&fd].clone();
++                    let shmbuf = &inner_.shmbufs[&fd];
+ 
+                     let fourcc = if alpha {
+                         Fourcc::Argb8888
+@@ -1300,8 +1323,8 @@ impl Cast {
+                         Fourcc::Xrgb8888
+                     };
+ 
+-                    render_to_shmbuf(renderer, damage_tracker, &shmbuf, fourcc, elements, states)
+-                        .map(|()| (SyncPoint::signaled(), SharingBuf::Shm(shmbuf)))
++                    render_to_shmbuf(renderer, damage_tracker, shmbuf, fourcc, elements, states)
++                        .map(|()| (SyncPoint::signaled(), SharingBuf::Shm(shmbuf.layout)))
+                 }
+                 _ => Err(anyhow::anyhow!(
+                     "unknown data type in dequeue_buffer_and_render"
+@@ -1361,8 +1384,10 @@ impl Cast {
+                     clear_dmabuf(renderer, dmabuf).map(|x| (x, SharingBuf::Dma))
+                 }
+                 x if x == DataType::MemFd.as_raw() => {
+-                    let shmbuf = self.inner.borrow().shmbufs[&fd].clone();
+-                    clear_shmbuf(&shmbuf).map(|()| (SyncPoint::signaled(), SharingBuf::Shm(shmbuf)))
++                    let inner = self.inner.borrow();
++                    let shmbuf = &inner.shmbufs[&fd];
++                    clear_shmbuf(shmbuf);
++                    Ok((SyncPoint::signaled(), SharingBuf::Shm(shmbuf.layout)))
+                 }
+                 _ => Err(anyhow::anyhow!(
+                     "unknown data type in dequeue_buffer_and_clear"
+@@ -1616,10 +1641,11 @@ fn allocate_dmabuf(
+     Ok(dmabuf)
+ }
+ 
+-#[derive(Debug, Clone)]
++#[derive(Debug)]
+ pub struct Shmbuf {
+-    fd: Rc<OwnedFd>,
++    fd: OwnedFd,
+     layout: ShmLayout,
++    mapping: ShmMapping,
+ }
+ 
+ #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+@@ -1651,7 +1677,7 @@ impl ShmLayout {
+ 
+ enum SharingBuf {
+     Dma,
+-    Shm(Shmbuf),
++    Shm(ShmLayout),
+ }
+ 
+ fn allocate_shmbuf(size: Size<u32, Physical>) -> anyhow::Result<Shmbuf> {
+@@ -1664,9 +1690,13 @@ fn allocate_shmbuf(size: Size<u32, Physical>) -> anyhow::Result<Shmbuf> {
+     ftruncate(&fd, layout.size.into()).context("error setting size of the fd")?;
+     fcntl_add_seals(&fd, SealFlags::SEAL | SealFlags::SHRINK | SealFlags::GROW)
+         .context("error sealing the fd")?;
++    // SAFETY: The file has the requested size and is sealed against shrinking.
++    // We only access the mapping while we own the dequeued PipeWire buffer.
++    let mapping = unsafe { ShmMapping::new(fd.as_fd(), layout.size_usize()) }?;
+     Ok(Shmbuf {
+-        fd: fd.into(),
++        fd,
+         layout,
++        mapping,
+     })
+ }
+ 
+@@ -1706,8 +1736,8 @@ unsafe fn mark_buffer_as_good(pw_buffer: NonNull<pw_buffer>, sequence: &mut u64,
+             // Clear the corrupted flag we may have set before.
+             (*chunk).flags = SPA_CHUNK_FLAG_NONE as i32;
+         }
+-        SharingBuf::Shm(shmbuf) => {
+-            (*chunk).size = shmbuf.layout.size;
++        SharingBuf::Shm(layout) => {
++            (*chunk).size = layout.size;
+             (*chunk).flags = SPA_CHUNK_FLAG_NONE as i32;
+         }
+     }
+@@ -1899,45 +1929,12 @@ fn render_to_shmbuf(
+         .map_texture(&mapping)
+         .context("error mapping texture")?;
+ 
+-    unsafe {
+-        let buf = mmap(
+-            std::ptr::null_mut(),
+-            buffer.layout.size_usize(),
+-            ProtFlags::READ | ProtFlags::WRITE,
+-            MapFlags::SHARED,
+-            buffer.fd.clone(),
+-            0,
+-        )?;
+-        {
+-            let buf = slice::from_raw_parts_mut(buf.cast::<u8>(), buffer.layout.size_usize());
+-            buf.copy_from_slice(bytes);
+-        }
+-        if let Err(err) = munmap(buf, buffer.layout.size_usize()) {
+-            warn!("error unmapping shm buffer: {err:?}");
+-        }
+-    }
++    buffer.mapping.copy_frame(bytes);
+     Ok(())
+ }
+ 
+-fn clear_shmbuf(buffer: &Shmbuf) -> anyhow::Result<()> {
+-    unsafe {
+-        let buf = mmap(
+-            std::ptr::null_mut(),
+-            buffer.layout.size_usize(),
+-            ProtFlags::READ | ProtFlags::WRITE,
+-            MapFlags::SHARED,
+-            buffer.fd.clone(),
+-            0,
+-        )?;
+-        {
+-            let buf = slice::from_raw_parts_mut(buf.cast::<u8>(), buffer.layout.size_usize());
+-            buf.fill(0);
+-        }
+-        if let Err(err) = munmap(buf, buffer.layout.size_usize()) {
+-            warn!("error unmapping shm buffer: {err:?}");
+-        }
+-    }
+-    Ok(())
++fn clear_shmbuf(buffer: &Shmbuf) {
++    buffer.mapping.clear();
+ }
+ 
+ #[cfg(test)]
+diff --git a/src/screencasting/pw_utils/shm_mapping.rs b/src/screencasting/pw_utils/shm_mapping.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..ebc92e8c925ec2067bc48dd30bc7b15638211faf
+--- /dev/null
++++ b/src/screencasting/pw_utils/shm_mapping.rs
+@@ -0,0 +1,63 @@
++use std::os::fd::BorrowedFd;
++use std::{ptr, slice};
++
++use anyhow::{ensure, Context as _};
++use smithay::reexports::rustix::mm::{mmap, munmap, MapFlags, ProtFlags};
++
++/// Owns a mapping of a sealed, fixed-size memfd. No references into it escape.
++#[derive(Debug)]
++pub(super) struct ShmMapping {
++    address: *mut std::ffi::c_void,
++    len: usize,
++}
++
++impl ShmMapping {
++    /// # Safety
++    ///
++    /// The file must contain at least `len` initialized bytes and must not shrink
++    /// while mapped. Access through other mappings must be synchronized with
++    /// calls to `copy_frame` and `clear` for the lifetime of this mapping.
++    pub(super) unsafe fn new(fd: BorrowedFd<'_>, len: usize) -> anyhow::Result<Self> {
++        ensure!(
++            len > 0 && len <= isize::MAX as usize,
++            "invalid mapping length"
++        );
++        let address = unsafe {
++            mmap(
++                ptr::null_mut(),
++                len,
++                ProtFlags::READ | ProtFlags::WRITE,
++                MapFlags::SHARED,
++                fd,
++                0,
++            )
++        }
++        .context("error mapping SHM buffer")?;
++        Ok(Self { address, len })
++    }
++
++    pub(super) fn copy_frame(&self, bytes: &[u8]) {
++        let _span = tracy_client::span!();
++
++        // SAFETY: The constructor's contract keeps the memory valid and ensures
++        // exclusive access during this write. No references into the mapping escape.
++        let buffer = unsafe { slice::from_raw_parts_mut(self.address.cast::<u8>(), self.len) };
++        buffer.copy_from_slice(bytes);
++    }
++
++    pub(super) fn clear(&self) {
++        let _span = tracy_client::span!();
++
++        // SAFETY: As in copy_frame, the mapping is valid and exclusively accessed.
++        let buffer = unsafe { slice::from_raw_parts_mut(self.address.cast::<u8>(), self.len) };
++        buffer.fill(0);
++    }
++}
++
++impl Drop for ShmMapping {
++    fn drop(&mut self) {
++        if let Err(err) = unsafe { munmap(self.address, self.len) } {
++            warn!("error unmapping SHM buffer: {err}");
++        }
++    }
++}
+diff --git a/src/tests/minimize_animation.rs b/src/tests/minimize_animation.rs
+index 8faab3d9f9be7e314cea40ea5ed0933a9d6a3fd8..12e03948561b1d6451d7502c240b5421d458ea21 100644
+--- a/src/tests/minimize_animation.rs
++++ b/src/tests/minimize_animation.rs
+@@ -1172,3 +1172,64 @@ fn egl_genie_first_frame_preserves_texture_padding_when_overlapping_dock() {
+         );
+     }
+ }
++
++#[test]
++fn egl_genie_first_frame_stays_at_window_position_on_hidpi_output() {
++    let mut f = setup_with_timing(
++        "output \"headless-1\" { scale 2; }\nwindow-rule { open-floating true; }",
++        "genie",
++        "",
++    );
++    let client = f.add_client();
++    let (_, id) = window(&mut f, client, [u32::MAX, 0, 0]);
++    let win = f.niri().find_window_by_id(id).unwrap();
++    f.niri().layout.move_floating_window(
++        Some(&win),
++        niri_ipc::PositionChange::SetFixed(50.),
++        niri_ipc::PositionChange::SetFixed(40.),
++        false,
++    );
++    f.niri_complete_animations();
++    set_time(f.niri(), Duration::ZERO);
++    let output = f.niri_output(1);
++    let owner = Rc::new(());
++    f.niri().layout.set_window_animation_targets(
++        &owner,
++        vec![AnimationTarget {
++            id: win,
++            output: output.clone(),
++            rect: Rectangle::new((320., 250.).into(), (32., 32.).into()),
++            edge: DockEdge::Bottom,
++            layer: None,
++        }],
++    );
++    let before = pixels(&mut f, &output, RenderTarget::Output);
++    assert!(red_pixels(&mut f, &output, RenderTarget::Output) > 1000);
++    assert!(f.niri_state().minimize_window(Some(id)));
++    let first = pixels(&mut f, &output, RenderTarget::Output);
++    assert!(
++        before
++            .chunks_exact(4)
++            .map(is_red)
++            .eq(first.chunks_exact(4).map(is_red)),
++        "Genie moved the first frame away from the window on a 2x output"
++    );
++
++    f.niri_complete_animations();
++    let start = f.niri().clock.now();
++    assert!(f.niri_state().restore_window(Some(id), None, true));
++    set_time(f.niri(), start + Duration::from_millis(150));
++    f.niri().advance_animations();
++    let restoring = pixels(&mut f, &output, RenderTarget::Output);
++    let width =
++        (output_size(&output).w * output.current_scale().fractional_scale()).round() as usize;
++    let near_icon = restoring
++        .chunks_exact(4)
++        .enumerate()
++        .filter(|(index, pixel)| is_red(pixel) && index % width >= 560 && index / width >= 400)
++        .count();
++    assert!(
++        near_icon > 100,
++        "Genie restore did not start near the Dock icon"
++    );
++}

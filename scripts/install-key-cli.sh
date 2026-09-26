@@ -14,10 +14,12 @@ git init -q "$task_tmp/source"
 git -C "$task_tmp/source" remote add origin "${source_info[0]}"
 git -C "$task_tmp/source" fetch --depth 1 origin "${source_info[1]}"
 git -C "$task_tmp/source" checkout --detach FETCH_HEAD
-if command -v pkexec >/dev/null 2>&1; then
+if command -v pkexec >/dev/null 2>&1 && [[ -n ${WAYLAND_DISPLAY:-}${DISPLAY:-} ]]; then
     mkdir "$task_tmp/bin"
     install -m 700 "$repo_dir/scripts/pkexec-sudo" "$task_tmp/bin/sudo"
     export PATH="$task_tmp/bin:$PATH"
+else
+    echo 'Enter your password in this terminal when sudo prompts.'
 fi
 "$task_tmp/source/scripts/install.sh"
 /usr/local/bin/key tool status
