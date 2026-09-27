@@ -41,7 +41,7 @@ cd desktop-config
 | 部分 | 内容 |
 | --- | --- |
 | 原生 Dock | 固定应用、顺序、大小、放大、自动隐藏、窗口预览和最小化设置 |
-| 应用菜单 | 基于 cccp00-cup 的 macOS Launchpad，适配 Niri 覆盖层、Clavis 壁纸、图标预加载和统一出场动画；支持 Dock 与 Super+Ctrl+Space 呼出，沿用 `config/clavis/launchpad.json` 分组 |
+| 应用菜单 | 基于 cccp00-cup 的 macOS Launchpad，适配 Niri 覆盖层、Clavis 壁纸、图标预加载和统一出场动画；支持 Dock 与单击 Win 呼出，沿用 `config/clavis/launchpad.json` 分组 |
 | 顶部组件 | 最大化时自动隐藏、边缘唤出、通知短暂显示、常驻歌词及菜单打开时的顶栏稳定处理 |
 | 文件管理器 | 默认使用 Nautilus，保留浅绿色界面、紫灰色 Clavis-Reference 图标，以及防止 KDE GTK 同步覆盖的设置；安装脚本不再安装 Dolphin |
 | 图标与字体 | Clavis 使用 MacTahoe-light；保留 Noto Sans CJK、Google Sans Flex 等字体选择和字体配置 |
@@ -78,6 +78,7 @@ python3 scripts/restore.py --apply
 ./scripts/install-icon-theme.sh
 ./scripts/build-clavis.sh
 ./scripts/build-launchpad.sh
+./scripts/install-launchpad-keybinding.sh
 ./scripts/enable-services.sh
 ```
 
@@ -96,12 +97,18 @@ Niri 源码默认放在 `~/.local/share/niri-desktop-source`；用 `NIRI_SOURCE_
 若需切回内置菜单，把 `~/.config/clavis/launchpad-backend.json` 的 `external` 改为 `false`，
 再执行 `systemctl --user disable --now clavis-launchpad.service`。
 
+Win 快捷键由 keyd 将左右 Win 的单击映射到 F13，再由 Niri 打开应用菜单；
+Win 与其他按键组合时保持原来的修饰键功能。单击需在 300ms 内松开，长按不打开菜单。
+`install-launchpad-keybinding.sh` 安装 `/etc/keyd/clavis-launchpad.conf` 并启用 keyd；
+如已有其他 keyd 配置，脚本会停止，避免覆盖已有映射。停用映射可运行
+`pkexec systemctl disable --now keyd.service`。其他桌面若要使用同一单击动作，需绑定 F13。
+
 ## 新机器上的差异
 
 - 本快照包含 `window-minimize-effect "genie"`，必须完成 `build-niri.sh` 后才使用该配置。
   普通发行版 Niri 可能尚不支持这个选项，不能只复制配置而跳过构建。
 - 启用中文 UTF-8 locale（通常是 `zh_CN.UTF-8`）。网络、蓝牙、声卡驱动和休眠能力
-  由新系统设置；仓库不自动覆盖 `/etc`、bootloader、resume 或硬件授权。
+  由新系统设置；除上述 keyd 规则外，仓库不自动覆盖 `/etc`、bootloader、resume 或硬件授权。
 - 新电脑需要重新确认显示器缩放、布局、鼠标、功耗模式和合盖设置。
   `system-reference/` 保存原机器的电源、设备和应用兼容配置参考。
 - QQ、微信、腾讯会议和 WPS 的专用二进制兼容环境不随配置上传。

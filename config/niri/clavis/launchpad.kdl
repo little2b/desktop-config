@@ -1,5 +1,6 @@
 binds {
-    Mod+Ctrl+Space repeat=false hotkey-overlay-title="应用菜单" {
+    // keyd emits F13 only when Win is tapped without another key.
+    F13 repeat=false hotkey-overlay-title="应用菜单：单击 Win" {
         spawn "qs" "-c" "clavis" "ipc" "call" "launchpad" "toggle";
     }
 }
