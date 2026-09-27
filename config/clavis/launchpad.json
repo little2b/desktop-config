@@ -4,10 +4,9 @@
     {
       "kind": "folder",
       "id": "group-1790233725220-q2btp3",
-      "name": "Folder",
+      "name": "一般不会打开",
       "children": [
         "cups",
-        "org.kde.kmenuedit",
         "kbd-layout-viewer5",
         "org.pulseaudio.pavucontrol",
         "bssh",
@@ -28,7 +27,6 @@
         "org.kde.kwrite",
         "org.kde.kwalletmanager",
         "org.kde.kdeconnect.sms",
-        "org.kde.kinfocenter",
         "com.shellyorg.shelly",
         "qdbusviewer",
         "linguist",
@@ -50,7 +48,7 @@
     {
       "kind": "folder",
       "id": "group-1790233783373-yfmib6",
-      "name": "Folder",
+      "name": "LibreOffice",
       "children": [
         "libreoffice-math",
         "libreoffice-impress",
@@ -64,7 +62,7 @@
     {
       "kind": "folder",
       "id": "group-1790233812285-93x1bi",
-      "name": "Folder",
+      "name": "WPS",
       "children": [
         "wps-office-pdf",
         "wps-office-et",
@@ -135,10 +133,6 @@
     },
     {
       "kind": "app",
-      "id": "org.kde.plasma.emojier"
-    },
-    {
-      "kind": "app",
       "id": "firefox"
     },
     {
@@ -151,8 +145,7 @@
       "name": "文件夹",
       "children": [
         "kdesystemsettings",
-        "org.clavis.Settings",
-        "systemsettings"
+        "org.clavis.Settings"
       ]
     },
     {

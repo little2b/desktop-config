@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=WeChat
+Name[zh_CN]=微信
+Exec="@HOME@/.local/bin/chat-hidpi-launch" wechat %U
+TryExec=/opt/wechat/wechat
+StartupNotify=true
+StartupWMClass=wechat
+Terminal=false
+Icon=/usr/share/icons/hicolor/256x256/apps/wechat.png
+Type=Application
+Categories=Network;InstantMessaging;Chat;
+Comment=WeChat Desktop
+Comment[zh_CN]=微信桌面版
+Keywords=wechat;weixin;微信;

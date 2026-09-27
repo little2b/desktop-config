@@ -1,0 +1,4 @@
+! WPS display only; current monitors both use 200% scaling.
+Xcursor.theme: capitaine-cursors
+Xcursor.size: 48
+Xft.dpi: 192

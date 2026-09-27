@@ -2,7 +2,7 @@
   "clavis": {
     "repository": "https://github.com/little2b/quickshell.git",
     "branch": "personal/fedora-niri",
-    "commit": "ae237b52efa2fd91fd14fb0620696d14ca804372",
+    "commit": "807bb72a4621003205bd0795f4a3f7f55616aa5a",
     "upstream_repository": "https://github.com/StatIndet/quickshell.git",
     "upstream_commit": "ac388acf9a4537cf1c69232aceb326af9478b71f"
   },
@@ -30,7 +30,7 @@
     "niri_commit": "ed0fe6141a7cb82f23e947ec1e49bb6399ec9877"
   },
   "desktop_snapshot": {
-    "captured_at": "2026-09-26T16:43:31+08:00",
+    "captured_at": "2026-09-27T16:24:57+08:00",
     "dock": "clavis-native"
   },
   "niri": {

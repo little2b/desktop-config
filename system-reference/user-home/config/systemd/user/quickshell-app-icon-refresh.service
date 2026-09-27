@@ -1,0 +1,7 @@
+[Unit]
+Description=Refresh Quickshell application icon caches
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/sleep 5
+ExecStart=/usr/bin/systemctl --user try-restart nyx-dock.service

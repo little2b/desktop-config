@@ -1,0 +1,16 @@
+[Unit]
+Description=Restore JBL PS3500 hardware volume
+After=pipewire.service wireplumber.service
+Wants=pipewire.service wireplumber.service
+StartLimitIntervalSec=60
+StartLimitBurst=30
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/amixer -c PS3500 set PCM 99 unmute
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

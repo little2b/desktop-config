@@ -51,6 +51,7 @@ cd desktop-config
 | 壁纸与组件 | 当前壁纸、头像、天气位置、桌面卡片和侧栏设置 |
 | QQ / Manggo | 截图与翻译的辅助脚本、Niri 快捷键和 portal 注册 |
 | 网盘 | 夸克网盘入口和挂载服务定义；账号在新机重新配置 |
+| 本机兼容参考 | 微信/QQ 与 WPS 的 XWayland/输入法启动脚本、微信通知桥接、音量恢复、服务片段及 ChatGPT 启动修复 |
 
 Dock 与应用菜单只保存应用入口，不会安装所有固定的软件。Chrome、QQ、微信、
 WPS、Codex、腾讯会议等需另行安装；安装后的 desktop ID 不同时重新固定即可。
@@ -95,11 +96,19 @@ Niri 源码默认放在 `~/.local/share/niri-desktop-source`；用 `NIRI_SOURCE_
 - 启用中文 UTF-8 locale（通常是 `zh_CN.UTF-8`）。网络、蓝牙、声卡驱动和休眠能力
   由新系统设置；仓库不自动覆盖 `/etc`、bootloader、resume 或硬件授权。
 - 新电脑需要重新确认显示器缩放、布局、鼠标、功耗模式和合盖设置。
-  `system-reference/` 仅为原机器的电源策略参考。
+  `system-reference/` 保存原机器的电源、设备和应用兼容配置参考。
 - QQ、微信、腾讯会议和 WPS 的专用二进制兼容环境不随配置上传。
   QQ 的 `Ctrl+Alt+A` 辅助流程会临时关闭其他屏幕；完成、取消或超时后恢复。
   QQ 应用内的截图按钮不会调用此流程。
 - `~/.local/bin` 需要位于 PATH 前部；Niri 配置和服务使用已恢复的包装入口。
+
+`system-reference/user-home/` 按 `config`、`bin`、`share` 保存额外的本机配置，Home
+路径使用 `@HOME@` 占位符。它们纳入校验清单，但不会由 `restore.py` 自动安装或启用。
+聊天/WPS 启动器依赖另行准备的定制 XWayland 二进制及显示器缩放设置；音量服务对应
+JBL PS3500；图标刷新服务保留了旧独立 Dock 的调用，仅作历史配置参考。
+`system-reference/chatgpt/` 保存本地启动补丁和 Pacman 钩子，仅匹配已核验的
+`26.924.22138` 版本与归档哈希。其他版本使用前需要重新判断，仓库不包含应用归档、
+登录数据或补丁运行时的备份。
 
 ## 刷新快照
 

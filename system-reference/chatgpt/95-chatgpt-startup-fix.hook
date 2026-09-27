@@ -1,0 +1,10 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = chatgpt-bin
+
+[Action]
+Description = Restore the verified ChatGPT 26.924.22138 startup workaround
+When = PostTransaction
+Exec = /usr/local/libexec/chatgpt-startup-fix.py

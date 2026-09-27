@@ -13,6 +13,27 @@ ROOT = Path(__file__).resolve().parents[1]
 METRICS = ['systemMonitorGpuId', 'systemMonitorDiskDevice', 'systemMonitorNetworkInterface', 'storageCapacityDiskDevice']
 RETIRED_FILES = ['bin/dolphin', 'share/applications/org.kde.dolphin.desktop',
                  'config/dolphinrc', 'config/nyx-desktop-style/dolphin.qss']
+REFERENCE_CONFIG_FILES = [
+    'environment.d/50-desktop-input.conf',
+    'xwayland-chat.Xresources', 'xwayland-wps.Xresources',
+    'systemd/user/xwayland-chat.service', 'systemd/user/xwayland-wps.service',
+    'systemd/user/wechat-notification-bridge.service',
+    'systemd/user/jbl-ps3500-volume.service',
+    'systemd/user/quickshell-app-icon-refresh.path',
+    'systemd/user/quickshell-app-icon-refresh.service',
+    'systemd/user/app-org.fcitx.Fcitx5@autostart.service.d/30-chat-display.conf',
+    'systemd/user/fcitx5-niri.service.d/30-chat-display.conf',
+    'systemd/user/niri.service.d/kwallet.conf',
+]
+REFERENCE_BIN_FILES = [
+    'chat-hidpi-launch', 'chat-hidpi-input', 'wps-niri-launch', 'wps-xwayland-input',
+    'wechat-notification-bridge.py', 'wps', 'wpspdf', 'et', 'wpp',
+]
+REFERENCE_DESKTOP_FILES = [
+    'chatgpt.desktop', 'wechat.desktop', 'qq.desktop',
+    'wps-office-et.desktop', 'wps-office-pdf.desktop', 'wps-office-prometheus.desktop',
+    'wps-office-wpp.desktop', 'wps-office-wps.desktop',
+]
 
 
 def clean_settings(value, home):
@@ -183,6 +204,20 @@ def capture(home, root=ROOT):
             saved.write(stream, space_around_delimiters=False)
     # Keep the previous Rime snapshot. Do not publish newly learned words or
     # personal phrases as a side effect of a desktop configuration backup.
+    # Machine-specific application workarounds are source references only.
+    # restore.py intentionally does not install system-reference/ files.
+    for relative in REFERENCE_CONFIG_FILES:
+        copy(home / '.config' / relative, 'system-reference/user-home/config/' + relative)
+    for name in REFERENCE_BIN_FILES:
+        copy(home / '.local/bin' / name, 'system-reference/user-home/bin/' + name)
+    for name in REFERENCE_DESKTOP_FILES:
+        copy(home / '.local/share/applications' / name,
+             'system-reference/user-home/share/applications/' + name)
+    if home == Path.home().resolve():
+        copy(Path('/usr/local/libexec/chatgpt-startup-fix.py'),
+             'system-reference/chatgpt/chatgpt-startup-fix.py')
+        copy(Path('/etc/pacman.d/hooks/95-chatgpt-startup-fix.hook'),
+             'system-reference/chatgpt/95-chatgpt-startup-fix.hook')
     lock['desktop_snapshot'] = {'captured_at': datetime.now().astimezone().isoformat(timespec='seconds'),
                                 'dock': 'clavis-native'}
     put('sources.lock.json', json.dumps(lock, ensure_ascii=False, indent=2) + '\n')

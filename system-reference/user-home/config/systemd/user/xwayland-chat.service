@@ -1,0 +1,17 @@
+[Unit]
+Description=HiDPI cursor compatibility for WeChat and QQ
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+Environment=XWS_CURSOR_SCALE=2
+Environment=XCURSOR_THEME=capitaine-cursors
+Environment=XCURSOR_SIZE=48
+ExecStart=%h/.local/libexec/xwayland-satellite-hidpi :2 -nolisten tcp
+ExecStartPost=/usr/bin/xrdb -display :2 -merge %h/.config/xwayland-chat.Xresources
+ExecStartPost=-%h/.local/bin/chat-hidpi-input
+TimeoutStartSec=20
+Restart=on-failure
+RestartSec=3

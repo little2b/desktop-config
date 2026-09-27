@@ -1,0 +1,4 @@
+! Only the dedicated chat display. Cursor buffers are displayed at scale 2.
+Xcursor.theme: capitaine-cursors
+Xcursor.size: 48
+Xft.dpi: 192

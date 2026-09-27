@@ -1,0 +1,18 @@
+[Unit]
+Description=WPS XWayland maximize and HiDPI cursor compatibility
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+# Both current monitors use 200% scaling; cursor buffers are 48px at scale 2.
+Environment=XWS_CURSOR_SCALE=2
+Environment=XCURSOR_THEME=capitaine-cursors
+Environment=XCURSOR_SIZE=48
+ExecStart=%h/.local/libexec/xwayland-satellite-wps :3 -nolisten tcp
+ExecStartPost=/usr/bin/xrdb -display :3 -merge %h/.config/xwayland-wps.Xresources
+ExecStartPost=-%h/.local/bin/wps-xwayland-input
+TimeoutStartSec=20
+Restart=on-failure
+RestartSec=3

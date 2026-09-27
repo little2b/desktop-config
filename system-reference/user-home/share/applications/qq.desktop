@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=QQ
+Exec="@HOME@/.local/bin/chat-hidpi-launch" qq %U
+Terminal=false
+Type=Application
+Icon=/usr/share/icons/hicolor/512x512/apps/qq.png
+StartupWMClass=QQ
+Categories=Network;
+Comment=QQ

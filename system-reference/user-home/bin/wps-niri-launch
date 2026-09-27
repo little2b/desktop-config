@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+
+wps_component="${1:-wps}"
+case "$wps_component" in
+    wps|et|wpp|wpspdf) if (( $# > 0 )); then shift; fi ;;
+    *) printf '%s\n' 'Usage: wps-niri-launch wps|et|wpp|wpspdf [files...]' >&2; exit 2 ;;
+esac
+
+if ! /usr/bin/systemctl --user start xwayland-wps.service; then
+    /usr/bin/notify-send --app-name=WPS 'WPS 显示服务启动失败' '请检查 xwayland-wps.service 的运行状态。'
+    exit 1
+fi
+if ! @HOME@/.local/bin/wps-xwayland-input; then
+    /usr/bin/notify-send --app-name=WPS 'WPS 输入法尚未连接' '请确认 Fcitx5 正在运行，然后重新打开 WPS。'
+fi
+
+exec /usr/bin/env DISPLAY=:3 XCURSOR_THEME=capitaine-cursors XCURSOR_SIZE=48 \
+    QT_QPA_PLATFORM=xcb GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx XMODIFIERS=@im=fcitx \
+    "/usr/bin/$wps_component" "$@"

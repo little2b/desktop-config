@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+
+# Register WPS's separate X display with the existing Fcitx process.
+[[ -S /tmp/.X11-unix/X3 ]] || exit 1
+for wps_input_attempt in {1..12}; do
+    if wps_input_result=$(LC_ALL=C /usr/bin/busctl --user --auto-start=no --timeout=2 call \
+        org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 \
+        OpenX11Connection s :3 2>&1); then
+        exit 0
+    fi
+    if [[ "$wps_input_result" == 'Call failed: X11 connection already exists.' ]]; then
+        exit 0
+    fi
+    /usr/bin/sleep 0.25
+done
+printf '%s\n' "$wps_input_result" >&2
+exit 1

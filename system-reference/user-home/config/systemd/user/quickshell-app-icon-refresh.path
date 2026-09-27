@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch installed desktop applications for icon changes
+
+[Path]
+PathChanged=/usr/share/applications
+PathChanged=%h/.local/share/applications
+PathChanged=%h/.local/share/flatpak/exports/share/applications
+Unit=quickshell-app-icon-refresh.service
+
+[Install]
+WantedBy=default.target

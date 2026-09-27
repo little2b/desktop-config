@@ -1,0 +1,46 @@
+#!/bin/bash
+set -euo pipefail
+
+chat_app="${1:-}"
+case "$chat_app" in
+    wechat|qq) shift ;;
+    *) printf '%s\n' 'Usage: chat-hidpi-launch wechat|qq [arguments...]' >&2; exit 2 ;;
+esac
+
+# The opt-in cursor workaround is designed for the current uniform 200% setup.
+# With other monitor scales, use the ordinary display at normal cursor size.
+chat_display="${DISPLAY:-:0}"
+chat_cursor_size=24
+if /usr/bin/niri msg --json outputs | /usr/bin/jq -e '
+    [.[] | select(.logical != null) | .logical.scale] as $scales
+    | ($scales | length) > 0 and ($scales | all(. == 2))' >/dev/null; then
+    if ! /usr/bin/systemctl --user start xwayland-chat.service; then
+        /usr/bin/notify-send --app-name='聊天应用' '光标兼容服务启动失败' '请检查 xwayland-chat.service 的运行状态。'
+        exit 1
+    fi
+    if @HOME@/.local/bin/chat-hidpi-input; then
+        chat_display=:2
+        chat_cursor_size=48
+    else
+        /usr/bin/notify-send --app-name='聊天应用' '暂用原显示服务' '输入法尚未连接，优先保留中文输入。'
+    fi
+fi
+
+chat_environment=(
+    "DISPLAY=$chat_display"
+    "XCURSOR_THEME=capitaine-cursors"
+    "XCURSOR_SIZE=$chat_cursor_size"
+    "GTK_IM_MODULE=fcitx"
+    "QT_IM_MODULE=fcitx"
+    "XMODIFIERS=@im=fcitx"
+)
+case "$chat_app" in
+    wechat)
+        exec /usr/bin/env "${chat_environment[@]}" LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh \
+            LC_ALL=zh_CN.UTF-8 QT_QPA_PLATFORM=xcb QT_AUTO_SCREEN_SCALE_FACTOR=1 \
+            /opt/wechat/wechat "$@"
+        ;;
+    qq)
+        exec /usr/bin/env "${chat_environment[@]}" /usr/bin/linuxqq --ozone-platform=x11 "$@"
+        ;;
+esac
