@@ -144,8 +144,8 @@
       "id": "group-1790264558394-mbl69f",
       "name": "文件夹",
       "children": [
-        "kdesystemsettings",
-        "org.clavis.Settings"
+        "org.clavis.Settings",
+        "kdesystemsettings"
       ]
     },
     {
@@ -187,6 +187,18 @@
     {
       "kind": "app",
       "id": "zotero"
+    },
+    {
+      "kind": "app",
+      "id": "easyconnect"
+    },
+    {
+      "kind": "app",
+      "id": "steam"
+    },
+    {
+      "kind": "app",
+      "id": "code-1.98.2"
     }
   ]
 }

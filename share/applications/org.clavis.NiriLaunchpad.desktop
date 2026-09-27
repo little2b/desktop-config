@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Clavis Launchpad
+Name[zh_CN]=Clavis 启动台
+Exec=clavis-launchpad --toggle
+Icon=org.clavis.NiriLaunchpad
+Terminal=false
+NoDisplay=true
+Categories=Utility;

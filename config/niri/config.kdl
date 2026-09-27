@@ -783,3 +783,5 @@ include "manggo-shortcuts.kdl";
 include "qq-screenshot.kdl";
 
 include "clavis/minimize-animation.kdl";
+
+include "clavis/launchpad.kdl";

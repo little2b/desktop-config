@@ -1,0 +1,18 @@
+[Unit]
+Description=Clavis macOS-style Launchpad for Niri
+Requisite=niri.service
+PartOf=niri.service
+After=niri.service
+StartLimitIntervalSec=30
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/clavis-launchpad --background
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=5
+Environment=QT_QPA_PLATFORM=wayland
+
+[Install]
+WantedBy=niri.service

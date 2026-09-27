@@ -1,8 +1,8 @@
 {
   "clavis": {
     "repository": "https://github.com/little2b/quickshell.git",
-    "branch": "personal/fedora-niri",
-    "commit": "807bb72a4621003205bd0795f4a3f7f55616aa5a",
+    "branch": "personal/cachyos-niri",
+    "commit": "b173b6569ac52da7cdda4ebd464c3ee582b4c75f",
     "upstream_repository": "https://github.com/StatIndet/quickshell.git",
     "upstream_commit": "ac388acf9a4537cf1c69232aceb326af9478b71f"
   },
@@ -48,5 +48,12 @@
     "repository": "https://github.com/vinceliuice/MacTahoe-icon-theme.git",
     "commit": "839848b9a8a38a92a6936e30c4abe35cc6f2546d",
     "selected": "MacTahoe-light"
+  },
+  "launchpad": {
+    "upstream_repository": "https://github.com/cccp00-cup/macos-launchpad-for-linux",
+    "upstream_commit": "c4db4d8a708cf27935534f6bc87c72318940190f",
+    "source": "components/launchpad",
+    "installation": "scripts/build-launchpad.sh",
+    "layout": "~/.config/clavis/launchpad.json"
   }
 }

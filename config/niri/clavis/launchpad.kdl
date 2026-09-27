@@ -1,0 +1,5 @@
+binds {
+    Mod+Ctrl+Space repeat=false hotkey-overlay-title="应用菜单" {
+        spawn "qs" "-c" "clavis" "ipc" "call" "launchpad" "toggle";
+    }
+}

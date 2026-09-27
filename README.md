@@ -1,7 +1,7 @@
 # 个人 CachyOS / Arch · Niri / Clavis 桌面
 
 这个公开仓库保存当前桌面的可迁移配置、主题资源和安装脚本。桌面源码位于
-[little2b/quickshell](https://github.com/little2b/quickshell/tree/personal/fedora-niri)，
+[little2b/quickshell](https://github.com/little2b/quickshell/tree/personal/cachyos-niri)，
 本仓库通过 `sources.lock.json` 固定 Clavis、定制 Niri、key-cli 和 MacTahoe 图标的版本。
 
 ## 在另一台电脑上安装
@@ -32,7 +32,7 @@ cd desktop-config
 2. 备份目标电脑已有的同名文件，再恢复桌面设置。
 3. 编译固定版本的 `StatIndet/niri-edge` 并应用本仓库补丁；保留 Genie 最小化、
    HiDPI 坐标修复和 PipeWire SHM 屏幕共享修复。
-4. 安装固定提交的 MacTahoe 图标主题，编译并安装 Clavis 原生模块。
+4. 安装固定提交的 MacTahoe 图标主题，编译并安装 Clavis 原生模块和 Niri Launchpad。
 5. 校验 Niri 配置，启用 Clavis、剪贴板、Fcitx5 和主题同步服务。
    旧独立 `nyx-dock.service` 会被关闭，避免出现两个 Dock。
 
@@ -41,7 +41,7 @@ cd desktop-config
 | 部分 | 内容 |
 | --- | --- |
 | 原生 Dock | 固定应用、顺序、大小、放大、自动隐藏、窗口预览和最小化设置 |
-| 应用菜单 | Dock 入口、打开/翻页动画、搜索、应用排序和文件夹分组；布局保存在 `config/clavis/launchpad.json` |
+| 应用菜单 | 基于 cccp00-cup 的 macOS Launchpad，适配 Niri 覆盖层、Clavis 壁纸、图标预加载和统一出场动画；支持 Dock 与 Super+Ctrl+Space 呼出，沿用 `config/clavis/launchpad.json` 分组 |
 | 顶部组件 | 最大化时自动隐藏、边缘唤出、通知短暂显示、常驻歌词及菜单打开时的顶栏稳定处理 |
 | 文件管理器 | 默认使用 Nautilus，保留浅绿色界面、紫灰色 Clavis-Reference 图标，以及防止 KDE GTK 同步覆盖的设置；安装脚本不再安装 Dolphin |
 | 图标与字体 | Clavis 使用 MacTahoe-light；保留 Noto Sans CJK、Google Sans Flex 等字体选择和字体配置 |
@@ -77,6 +77,7 @@ python3 scripts/restore.py --apply
 ./scripts/build-niri.sh
 ./scripts/install-icon-theme.sh
 ./scripts/build-clavis.sh
+./scripts/build-launchpad.sh
 ./scripts/enable-services.sh
 ```
 
@@ -88,6 +89,12 @@ Clavis 源码默认放在 `~/.local/share/clavis-source`；用 `CLAVIS_SOURCE_DI
 Niri 源码默认放在 `~/.local/share/niri-desktop-source`；用 `NIRI_SOURCE_DIR` 可以另选目录。
 脚本拒绝覆盖已有的不同版本或本地修改。Niri 安装在用户目录，系统软件包保留，
 运行中的 compositor 不会被脚本强制重启。
+
+应用菜单源码和 GPL-3.0 许可证在 `components/launchpad/`，上游出处记录于该目录的
+`UPSTREAM.md`。`clavis-launchpad.service` 在登录 Niri 时后台预加载应用、图标与壁纸；
+它与 Clavis 共用布局文件，已有文件夹和排序不需要手动重建。安装/卸载应用后会刷新列表。
+若需切回内置菜单，把 `~/.config/clavis/launchpad-backend.json` 的 `external` 改为 `false`，
+再执行 `systemctl --user disable --now clavis-launchpad.service`。
 
 ## 新机器上的差异
 
@@ -129,7 +136,10 @@ git push
 
 ## 验证范围
 
-Clavis 的构建和 25 项现有测试、迁移仓库的 20 项测试及 ShellCheck 均通过。
+Niri Launchpad 的构建、交互回归测试、应用/分组模型测试和进程通信测试均通过；
+已在当前 Niri 会话验证覆盖层显示、Dock 调用、关闭后的焦点恢复及原有分组保留。
+Clavis 接入通过改动范围的 QML 检查，存在 3 条 QProcess 枚举类型的工具提示。
+迁移仓库的 20 项测试及 ShellCheck 通过。
 已从远程获取固定的 Niri 源码并验证补丁可完整应用，安装器下载的 SHA-256 也已核对。
 在临时目录验证了不同用户名、含空格 Home 路径、原文件备份、原生 Dock 分组、主题
 及硬件重置后的恢复结果；恢复后的 Niri 配置通过当前定制版的语法校验。

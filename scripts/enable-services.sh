@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
-for command in niri qs key keytop fcitx5 rclone; do
+for command in niri qs key keytop fcitx5 rclone clavis-launchpad; do
     command -v "$command" >/dev/null || { echo "Missing command: $command" >&2; exit 1; }
 done
 [[ -x /usr/local/bin/key ]] || { echo 'Install the pinned source key-cli backend first; see README.md.' >&2; exit 1; }
@@ -14,9 +14,9 @@ systemctl --user daemon-reload
 if systemctl --user cat nyx-dock.service >/dev/null 2>&1; then
     systemctl --user disable --now nyx-dock.service
 fi
-systemctl --user enable clavis-shell.service clavis-clipboard.service fcitx5-niri.service nyx-theme-sync.path
+systemctl --user enable clavis-shell.service clavis-launchpad.service clavis-clipboard.service fcitx5-niri.service nyx-theme-sync.path
 if systemctl --user is-active --quiet niri.service; then
-    systemctl --user start clavis-shell.service clavis-clipboard.service fcitx5-niri.service nyx-theme-sync.path
+    systemctl --user start clavis-launchpad.service clavis-shell.service clavis-clipboard.service fcitx5-niri.service nyx-theme-sync.path
     systemctl --user start nyx-theme-sync.service
 else
     echo 'Services enabled. Log in using the Niri session to start the desktop.'

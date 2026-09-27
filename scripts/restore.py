@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def verify(root=ROOT):
     manifest = json.loads((root / 'manifest.json').read_text())
-    actual = {str(p.relative_to(root)) for directory in ['config', 'share', 'lib', 'libexec', 'bin', 'rime', 'assets', 'hardware', 'system-reference', 'patches']
+    actual = {str(p.relative_to(root)) for directory in ['config', 'share', 'lib', 'libexec', 'bin', 'rime', 'assets', 'hardware', 'system-reference', 'patches', 'components']
               for p in (root / directory).rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc'}
     actual.add('sources.lock.json')
     if actual != set(manifest['sha256']):
@@ -99,7 +99,7 @@ def restore(target_home, same_hardware=False, apply=False, root=ROOT):
         return None
     active_units = []
     if target_home.resolve() == Path.home().resolve():
-        for unit in ['clavis-shell.service', 'nyx-dock.service', 'fcitx5-niri.service', 'nyx-theme-sync.path', 'nyx-theme-sync.service']:
+        for unit in ['clavis-shell.service', 'clavis-launchpad.service', 'nyx-dock.service', 'fcitx5-niri.service', 'nyx-theme-sync.path', 'nyx-theme-sync.service']:
             if subprocess.run(['systemctl', '--user', 'is-active', '--quiet', unit], check=False).returncode == 0:
                 active_units.append(unit)
         # Fcitx may have been started by desktop autostart rather than this unit.
@@ -145,7 +145,7 @@ def restore(target_home, same_hardware=False, apply=False, root=ROOT):
         finally:
             Path(temporary).unlink(missing_ok=True)
     print(f'Restored. Previous files: {backup}')
-    print('Next: build-niri.sh, install-icon-theme.sh, build-clavis.sh, then enable-services.sh.')
+    print('Next: build-niri.sh, install-icon-theme.sh, build-clavis.sh, build-launchpad.sh, then enable-services.sh.')
     return backup
 
 

@@ -64,6 +64,9 @@ def capture(home, root=ROOT):
         if dirty.strip():
             raise RuntimeError('Clavis source has uncommitted changes; commit it before capturing a reproducible snapshot')
         lock['clavis']['commit'] = subprocess.check_output(['git', '-C', str(source), 'rev-parse', 'HEAD'], text=True).strip()
+        branch = subprocess.check_output(['git', '-C', str(source), 'branch', '--show-current'], text=True).strip()
+        if branch:
+            lock['clavis']['branch'] = branch
 
     def put(relative, text):
         path = root / relative
@@ -94,7 +97,7 @@ def capture(home, root=ROOT):
         (root / relative).chmod(path.stat().st_mode & 0o777)
 
     for name in ['config.json', 'ui-preferences.json', 'quick-toggles.json', 'idle-policy.json', 'tray.json',
-                 'dock.json', 'launchpad.json']:
+                 'dock.json', 'launchpad.json', 'launchpad-backend.json']:
         path = home / '.config/clavis' / name
         if not path.is_file():
             continue
@@ -121,7 +124,7 @@ def capture(home, root=ROOT):
     copy(home / '.config/clavis/primary-display.json', 'hardware/primary-display.json')
     copy(home / '.config/niri/clavis/outputs.kdl', 'hardware/outputs.kdl')
     for relative in ['config.kdl', 'clavis/mouse.kdl', 'clavis/cursor.kdl', 'clavis/layer-rules.kdl',
-                     'clavis/effects.kdl', 'clavis/minimize-animation.kdl',
+                     'clavis/effects.kdl', 'clavis/minimize-animation.kdl', 'clavis/launchpad.kdl',
                      'manggo-shortcuts.kdl', 'qq-screenshot.kdl']:
         copy(home / '.config/niri' / relative, 'config/niri/' + relative)
     # Kitty is installed by the package manager, not the source user's symlink.
@@ -151,6 +154,8 @@ def capture(home, root=ROOT):
     copy(home / '.local/share/applications/org.kde.konsole.desktop', 'share/applications/org.kde.konsole.desktop')
     copy(home / '.local/share/applications/quark-drive.desktop', 'share/applications/quark-drive.desktop')
     copy(home / '.config/systemd/user/rclone-quark.service', 'config/systemd/user/rclone-quark.service')
+    copy(home / '.config/systemd/user/clavis-launchpad.service', 'config/systemd/user/clavis-launchpad.service')
+    copy(home / '.local/share/applications/org.clavis.NiriLaunchpad.desktop', 'share/applications/org.clavis.NiriLaunchpad.desktop')
     copy(home / '.local/lib/nyx-desktop-style/sync-theme.py', 'lib/nyx-desktop-style/sync-theme.py')
     input_theme = home / '.local/share/fcitx5/themes/ClavisWallpaper'
     for path in sorted(input_theme.glob('*')):

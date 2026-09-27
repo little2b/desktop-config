@@ -22,7 +22,7 @@ sudo pacman -Syu --needed git python curl github-cli rclone fcitx5 fcitx5-rime f
     wl-clipboard swaylock playerctl brightnessctl fd libqalculate kitty fish fuse3 \
     base-devel cmake ninja pkgconf clang rust wayland wayland-protocols \
     libinput libxkbcommon libdisplay-info seatd libpipewire pango cairo mesa \
-    qt6-base qt6-declarative qt6-wayland qt6-shadertools qt6-tools qtkeychain-qt6 glib2 \
+    qt6-base qt6-declarative qt6-wayland qt6-shadertools qt6-tools qtkeychain-qt6 layer-shell-qt glib2 \
     librsvg gtk-update-icon-cache
 # CachyOS and other configured repositories may provide a current niri-git
 # package. Install it before the upstream resolver so its `niri` provide is
