@@ -1,8 +1,0 @@
-/* Generated from Clavis; includes the file-view palette bridge. */
-QWidget { color: #181c20; selection-color: #001e2e; selection-background-color: #c7e7ff; }
-QMainWindow, QDialog, QToolBar, QDockWidget, QMenuBar { background-color: #ebeef3; }
-DolphinView, DolphinView QGraphicsView, DolphinView QGraphicsView QWidget { color: #181c20; background-color: #f6fafe; }
-QAbstractItemView { background-color: #f6fafe; alternate-background-color: #f1f4f9; }
-QMenu, QToolTip { background-color: #e5e8ed; color: #181c20; border: 1px solid #c1c7ce; }
-QMenu::item:selected, QToolButton:hover { background-color: #c7e7ff; color: #001e2e; }
-QLineEdit { color: #181c20; background-color: #f6fafe; selection-background-color: #c7e7ff; selection-color: #001e2e; }

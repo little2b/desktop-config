@@ -28,7 +28,12 @@ class ThemeTests(unittest.TestCase):
                 with self.subTest(background=background):
                     palette.update(surface_container_high=background, on_surface=foreground,
                                    primary_container=selected, on_primary_container=selected_text)
-                    theme.render(palette, base)
+                    profile = theme.render(palette, base)
+                    self.assertTrue((base / f'.local/share/konsole/{profile}.profile').is_file())
+                    terminal = configparser.ConfigParser()
+                    terminal.read(base / f'.local/share/konsole/{profile}.colorscheme')
+                    self.assertEqual(terminal['Foreground']['Color'], ','.join(map(str, theme.rgb(foreground))))
+                    self.assertFalse((base / '.config/nyx-desktop-style/dolphin.qss').exists())
                     theme_dir = base / '.local/share/fcitx5/themes/ClavisWallpaper'
                     parsed = configparser.ConfigParser()
                     parsed.read(theme_dir / 'theme.conf')

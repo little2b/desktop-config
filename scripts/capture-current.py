@@ -11,6 +11,8 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 METRICS = ['systemMonitorGpuId', 'systemMonitorDiskDevice', 'systemMonitorNetworkInterface', 'storageCapacityDiskDevice']
+RETIRED_FILES = ['bin/dolphin', 'share/applications/org.kde.dolphin.desktop',
+                 'config/dolphinrc', 'config/nyx-desktop-style/dolphin.qss']
 
 
 def clean_settings(value, home):
@@ -48,11 +50,9 @@ def capture(home, root=ROOT):
         path.write_text(text)
 
     def copy(path, relative):
-        if not path.is_file():
+        if relative in RETIRED_FILES or not path.is_file():
             return
         content = path.read_text()
-        if relative.startswith('bin/'):
-            content = content.replace(str(home) + '/.config/nyx-desktop-style/dolphin.qss', '"$HOME/.config/nyx-desktop-style/dolphin.qss"')
         if relative == 'bin/open-quark-drive':
             content = content.replace(str(home) + '/.local/share/cloud-mounts/quark', '"$HOME/.local/share/cloud-mounts/quark"')
         content = content.replace(str(home) + '/.local/bin/qs', '/usr/bin/qs')
@@ -121,11 +121,13 @@ def capture(home, root=ROOT):
         if (root / relative).is_dir():
             shutil.rmtree(root / relative)
     (root / 'config/systemd/user/nyx-dock.service').unlink(missing_ok=True)
+    # Nautilus is the default; do not recapture retired Dolphin customizations.
+    for relative in RETIRED_FILES:
+        (root / relative).unlink(missing_ok=True)
     # Preserve Arch-specific adaptations of the theme bridge and user services.
-    for name in ['dolphin', 'konsole', 'key', 'open-quark-drive']:
+    for name in ['konsole', 'key', 'open-quark-drive']:
         copy(home / '.local/bin' / name, 'bin/' + name)
-    for name in ['dolphin', 'konsole']:
-        copy(home / '.local/share/applications' / ('org.kde.' + name + '.desktop'), 'share/applications/org.kde.' + name + '.desktop')
+    copy(home / '.local/share/applications/org.kde.konsole.desktop', 'share/applications/org.kde.konsole.desktop')
     copy(home / '.local/share/applications/quark-drive.desktop', 'share/applications/quark-drive.desktop')
     copy(home / '.config/systemd/user/rclone-quark.service', 'config/systemd/user/rclone-quark.service')
     copy(home / '.local/lib/nyx-desktop-style/sync-theme.py', 'lib/nyx-desktop-style/sync-theme.py')
@@ -151,7 +153,7 @@ def capture(home, root=ROOT):
         for mime in ['inode/directory', 'video/matroska']:
             preferences['mime'][mime] = subprocess.check_output(['xdg-mime', 'query', 'default', mime], text=True).strip()
         put('config/nyx-desktop-style/desktop-preferences.json', json.dumps(preferences, ensure_ascii=False, indent=2) + '\n')
-    for name in ['dolphinrc', 'konsolerc', 'plasma-localerc', 'kded5rc']:
+    for name in ['konsolerc', 'plasma-localerc', 'kded5rc']:
         copy(home / '.config' / name, 'config/' + name)
     for folder in ['alacritty', 'kitty', 'fontconfig', 'fuzzel', 'gtk-3.0', 'gtk-4.0', 'nyx-desktop-style', 'fcitx5']:
         source_dir = home / '.config' / folder

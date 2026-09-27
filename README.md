@@ -43,7 +43,7 @@ cd desktop-config
 | 原生 Dock | 固定应用、顺序、大小、放大、自动隐藏、窗口预览和最小化设置 |
 | 应用菜单 | Dock 入口、打开/翻页动画、搜索、应用排序和文件夹分组；布局保存在 `config/clavis/launchpad.json` |
 | 顶部组件 | 最大化时自动隐藏、边缘唤出、通知短暂显示、常驻歌词及菜单打开时的顶栏稳定处理 |
-| 文件管理器 | Nautilus 浅绿色界面、紫灰色 Clavis-Reference 图标，以及防止 KDE GTK 同步覆盖的设置 |
+| 文件管理器 | 默认使用 Nautilus，保留浅绿色界面、紫灰色 Clavis-Reference 图标，以及防止 KDE GTK 同步覆盖的设置；安装脚本不再安装 Dolphin |
 | 图标与字体 | Clavis 使用 MacTahoe-light；保留 Noto Sans CJK、Google Sans Flex 等字体选择和字体配置 |
 | 终端 | Kitty、Alacritty 和 Konsole 的配色、透明度、字体、按键与主题同步 |
 | Niri | 快捷键、窗口规则、鼠标、光标、模糊和最小化动画配置 |

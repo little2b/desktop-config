@@ -14,7 +14,7 @@ class CaptureTests(unittest.TestCase):
     def test_rebase_and_remove_credentials_without_changing_preferences(self):
         source = {'file': '/home/source/Pictures/image.png', 'dark': True,
                   'nested': {'apiKey': 'do-not-publish', 'password': 'private', 'token': 'private', 'cookie': 'private'},
-                  'pinned': ['chatgpt', 'org.kde.dolphin'], 'sidebarCookieDialStyle': 'numbers'}
+                  'pinned': ['chatgpt', 'org.gnome.Nautilus'], 'sidebarCookieDialStyle': 'numbers'}
         result = capture.clean_settings(source, Path('/home/source'))
         self.assertEqual(result['file'], '@HOME@/Pictures/image.png')
         self.assertEqual(result['nested'], {'apiKey': '', 'password': '', 'token': '', 'cookie': ''})
@@ -38,8 +38,21 @@ class CaptureTests(unittest.TestCase):
                       'name': 'Work', 'children': ['editor', 'browser']}]}
             (home / '.config/clavis/dock.json').write_text(json.dumps(dock))
             (home / '.config/clavis/launchpad.json').write_text(json.dumps(groups))
+            retired = {
+                'bin/dolphin': '.local/bin/dolphin',
+                'share/applications/org.kde.dolphin.desktop': '.local/share/applications/org.kde.dolphin.desktop',
+                'config/dolphinrc': '.config/dolphinrc',
+                'config/nyx-desktop-style/dolphin.qss': '.config/nyx-desktop-style/dolphin.qss',
+            }
+            for snapshot_path, source_path in retired.items():
+                for path in [root / snapshot_path, home / source_path]:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text('old Dolphin customization\n')
             capture.capture(home, root)
             self.assertEqual(json.loads((root / 'config/clavis/dock.json').read_text()), dock)
             self.assertEqual(json.loads((root / 'config/clavis/launchpad.json').read_text()), groups)
             self.assertFalse((root / 'config/quickshell/nyx-dock').exists())
+            for snapshot_path, source_path in retired.items():
+                self.assertFalse((root / snapshot_path).exists())
+                self.assertTrue((home / source_path).is_file())
             self.assertEqual(json.loads((root / 'sources.lock.json').read_text())['clavis']['commit'], 'fixed')

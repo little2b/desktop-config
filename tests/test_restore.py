@@ -33,10 +33,14 @@ class RestoreTests(unittest.TestCase):
         backup = restore.restore(self.target, same_hardware=True, apply=True)
         self.assertEqual((backup / '.config/clavis/dock.json').read_text(), '{"existing": true}')
         desktop = configparser.ConfigParser(interpolation=None)
-        desktop.read(self.target / '.local/share/applications/org.kde.dolphin.desktop')
-        self.assertEqual(shlex.split(desktop['Desktop Entry']['Exec'])[0], str(self.target / '.local/bin/dolphin'))
         desktop.read(self.target / '.local/share/applications/org.kde.konsole.desktop')
+        self.assertEqual(shlex.split(desktop['Desktop Entry']['Exec'])[0], str(self.target / '.local/bin/konsole'))
         self.assertEqual(desktop['Desktop Entry']['TryExec'], '/usr/bin/konsole')
+        for relative in ['.local/bin/dolphin', '.local/share/applications/org.kde.dolphin.desktop',
+                         '.config/dolphinrc', '.config/nyx-desktop-style/dolphin.qss']:
+            self.assertFalse((self.target / relative).exists())
+        preferences = json.loads((self.target / '.config/nyx-desktop-style/desktop-preferences.json').read_text())
+        self.assertEqual(preferences['mime']['inode/directory'], 'org.gnome.Nautilus.desktop')
         dock = json.loads((self.target / '.config/clavis/dock.json').read_text())
         self.assertIn('org.clavis.Launchpad', [entry.get('desktopId') for entry in dock['pinned']])
         self.assertEqual(json.loads((self.target / '.config/clavis/launchpad.json').read_text()),

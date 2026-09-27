@@ -139,10 +139,6 @@
     },
     {
       "kind": "app",
-      "id": "org.kde.dolphin"
-    },
-    {
-      "kind": "app",
       "id": "firefox"
     },
     {

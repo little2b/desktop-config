@@ -170,20 +170,10 @@ def render(palette, base):
                     'Cursor Options': {'CursorShape': '1', 'BlinkingCursorEnabled': 'true'}}
     atomic(base / f'.local/share/konsole/{profile}.profile', ini(profile_data))
 
-    qss = f'''/* Generated from Clavis; includes the file-view palette bridge. */
-QWidget {{ color: {fg}; selection-color: {p['on_primary_container']}; selection-background-color: {p['primary_container']}; }}
-QMainWindow, QDialog, QToolBar, QDockWidget, QMenuBar {{ background-color: {p['surface_container']}; }}
-DolphinView, DolphinView QGraphicsView, DolphinView QGraphicsView QWidget {{ color: {fg}; background-color: {bg}; }}
-QAbstractItemView {{ background-color: {bg}; alternate-background-color: {p['surface_container_low']}; }}
-QMenu, QToolTip {{ background-color: {p['surface_container_high']}; color: {fg}; border: 1px solid {p['outline_variant']}; }}
-QMenu::item:selected, QToolButton:hover {{ background-color: {p['primary_container']}; color: {p['on_primary_container']}; }}
-QLineEdit {{ color: {fg}; background-color: {bg}; selection-background-color: {p['primary_container']}; selection-color: {p['on_primary_container']}; }}
-'''
-    atomic(base / '.config/nyx-desktop-style/dolphin.qss', qss)
     render_fcitx(p, base)
-    return profile, qss
+    return profile
 
-def refresh_live(profile, qss):
+def refresh_live(profile):
     from gi.repository import Gio, GLib
     bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
     def call(dest, path, interface, method, sig=None, args=()):
@@ -201,14 +191,9 @@ def refresh_live(profile, qss):
     def children(dest, path):
         return [path.rstrip('/') + '/' + node.get('name') for node in tree(dest, path).findall('node')]
     for dest in names:
-        if not (dest.startswith('org.kde.dolphin-') or dest.startswith('org.kde.konsole-')):
+        if not dest.startswith('org.kde.konsole-'):
             continue
         try:
-            if dest.startswith('org.kde.dolphin-'):
-                for path in children(dest, '/dolphin'):
-                    if path.rsplit('/', 1)[-1].startswith('Dolphin_'):
-                        call(dest, path, 'org.qtproject.Qt.QWidget', 'setStyleSheet', '(s)', (qss,))
-            # Konsole also exports sessions from Dolphin's embedded terminal.
             for path in children(dest, '/Sessions'):
                 current = call(dest, path, 'org.kde.konsole.Session', 'profile')[0]
                 if current in ('Nyx Dusk', '跟随桌面主题') or current.startswith(('NyxTheme-', 'NyxDusk')):
@@ -237,10 +222,9 @@ def main():
     parser.add_argument('--output-root', type=Path, default=BASE)
     parser.add_argument('--no-live', action='store_true')
     args = parser.parse_args()
-    profile, qss = render(json.loads(args.palette.read_text()), args.output_root)
+    profile = render(json.loads(args.palette.read_text()), args.output_root)
     if args.output_root == BASE:
-        for file, group, key, value in [('dolphinrc','UiSettings','ColorScheme',''),
-                                         ('konsolerc','UiSettings','ColorScheme',''),
+        for file, group, key, value in [('konsolerc','UiSettings','ColorScheme',''),
                                          ('konsolerc','Desktop Entry','DefaultProfile',profile + '.profile')]:
             subprocess.run(['kwriteconfig6','--file',str(BASE / '.config' / file),'--group',group,'--key',key,value], check=True)
         current = subprocess.check_output(['kreadconfig6','--file','kdeglobals','--group','General','--key','ColorScheme'], text=True).strip()
@@ -257,7 +241,7 @@ def main():
                     bus.emit_signal(None, '/KGlobalSettings', 'org.kde.KGlobalSettings', 'notifyChange', GLib.Variant('(ii)', (0, 0)))
                     bus.flush_sync(None)
         if not args.no_live:
-            refresh_live(profile, qss)
+            refresh_live(profile)
         # Keep bounded history while leaving other user profiles alone.
         profiles = sorted((BASE / '.local/share/konsole').glob('NyxTheme-*.profile'), key=lambda p: p.stat().st_mtime, reverse=True)
         for old in profiles[8:]:
