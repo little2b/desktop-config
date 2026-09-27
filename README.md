@@ -97,11 +97,13 @@ Niri 源码默认放在 `~/.local/share/niri-desktop-source`；用 `NIRI_SOURCE_
 若需切回内置菜单，把 `~/.config/clavis/launchpad-backend.json` 的 `external` 改为 `false`，
 再执行 `systemctl --user disable --now clavis-launchpad.service`。
 
-Win 快捷键由 keyd 将左右 Win 的单击映射到 F13，再由 Niri 打开应用菜单；
+Win 快捷键由 keyd 将左右 Win 的单击映射到 F13 的硬件键码；标准 XKB 映射将它解释为
+`XF86Tools`，因此 Niri 同时兼容 `XF86Tools` 和 `F13`，打开应用菜单。
 Win 与其他按键组合时保持原来的修饰键功能。单击需在 300ms 内松开，长按不打开菜单。
 `install-launchpad-keybinding.sh` 安装 `/etc/keyd/clavis-launchpad.conf` 并启用 keyd；
 如已有其他 keyd 配置，脚本会停止，避免覆盖已有映射。停用映射可运行
-`pkexec systemctl disable --now keyd.service`。其他桌面若要使用同一单击动作，需绑定 F13。
+`pkexec systemctl disable --now keyd.service`。其他桌面若要使用同一单击动作，需绑定
+键盘映射实际产生的 `XF86Tools`（部分映射为 `F13`）。
 
 ## 新机器上的差异
 
